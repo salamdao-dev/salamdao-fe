@@ -66,3 +66,19 @@ p {
     pointer-events: none;
   }
 } */
+
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+  /* Narrow scrollbar for less intrusive design */
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  /* Clean background */
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 75, 75, 0.5);
+  /* Visible but not overpowering */
+  border-radius: 10px;
+}

@@ -10,31 +10,75 @@ const networkList: Network[] = [
 ];
 
 const assetList: Asset[] = [
-  { network: "Ethereum", name: "Swell ETH", icon: "/assets/swell-eth.svg", address: "0x1234567890abcdef" },
-  { network: "Ethereum", name: "Staked Frax ETH", icon: "/assets/staked-frax-eth.svg", address: "0x1234567890abcdef" },
+  {
+    network: "Ethereum",
+    name: "Swell ETH",
+    symbol: "swETH",
+    icon: "/assets/swell-eth.svg",
+    address: "0x1234567890abcdef",
+  },
+  {
+    network: "Ethereum",
+    name: "Staked Frax ETH",
+    symbol: "sfrxETH",
+    icon: "/assets/staked-frax-eth.svg",
+    address: "0x1234567890abcdef",
+  },
   {
     network: "Ethereum",
     name: "Lido Wrapped stETH",
+    symbol: "wstETH",
     icon: "/assets/lido-wrapped-eth.svg",
     address: "0x1234567890abcdef",
   },
-  { network: "Ethereum", name: "Mantle ETH", icon: "/assets/mantle-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Rocket Pool ETH", icon: "/assets/rocketpool-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Coinbase ETH", icon: "/assets/coinbase-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Binance ETH", icon: "/assets/binance-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Stader ETH", icon: "/assets/stader-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Restaked Swell ETH", icon: "/assets/restaked-swell-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Etherfi Wrapped eETH", icon: "/assets/etherfi-wrapped-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Kelp Restaked ETH", icon: "/assets/kelp-restaked-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Renzo Restaked ETH", icon: "/assets/renzo-restaked-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Puffer Restaked ETH", icon: "/assets/puffer-restaked-eth.svg", address: "0x" },
-  { network: "Ethereum", name: "Staked Frax", icon: "/assets/staked-frax.svg", address: "0x" },
-  { network: "Ethereum", name: "USDC", icon: "/assets/usdc.svg", address: "0x" },
-  { network: "Ethereum", name: "Tether", icon: "/assets/tether.svg", address: "0x" },
-  { network: "Ethereum", name: "Savings DAI", icon: "/assets/savings-dai.svg", address: "0x" },
-  { network: "Ethereum", name: "Pendle rswETH", icon: "/assets/pendle-rsweth.svg", address: "0x" },
-  { network: "Ethereum", name: "Pendle weETH", icon: "/assets/pendle-weeth.svg", address: "0x" },
-  { network: "Ethereum", name: "Pendle rsETH", icon: "/assets/pendle-rseth.svg", address: "0x" },
+  { network: "Ethereum", name: "Mantle ETH", symbol: "mETH", icon: "/assets/mantle-eth.svg", address: "0x" },
+  { network: "Ethereum", name: "Rocket Pool ETH", symbol: "rETH", icon: "/assets/rocketpool-eth.svg", address: "0x" },
+  { network: "Ethereum", name: "Coinbase ETH", symbol: "cbETH", icon: "/assets/coinbase-eth.svg", address: "0x" },
+  { network: "Ethereum", name: "Binance ETH", symbol: "wbETH", icon: "/assets/binance-eth.svg", address: "0x" },
+  { network: "Ethereum", name: "Stader ETH", symbol: "ETHx", icon: "/assets/stader-eth.webp", address: "0x" },
+  {
+    network: "Ethereum",
+    name: "Restaked Swell ETH",
+    symbol: "rswETH",
+    icon: "/assets/restaked-swell-eth.svg",
+    address: "0x",
+  },
+  {
+    network: "Ethereum",
+    name: "Etherfi Wrapped eETH",
+    symbol: "WeETH",
+    icon: "/assets/etherfi-wrapped-eth.webp",
+    address: "0x",
+  },
+  {
+    network: "Ethereum",
+    name: "Kelp Restaked ETH",
+    symbol: "rsETH",
+    icon: "/assets/kelp-restaked-eth.svg",
+    address: "0x",
+  },
+  {
+    network: "Ethereum",
+    name: "Renzo Restaked ETH",
+    symbol: "ezETH",
+    icon: "/assets/renzo-restaked-eth.webp",
+    address: "0x",
+  },
+  {
+    network: "Ethereum",
+    name: "Puffer Restaked ETH",
+    symbol: "pufETH",
+    icon: "/assets/puffer-restaked-eth.svg",
+    address: "0x",
+  },
+  { network: "Ethereum", name: "Staked Frax", symbol: "sFRAX", icon: "/assets/staked-frax.svg", address: "0x" },
+  { network: "Ethereum", name: "USDC", symbol: "USDC", icon: "/assets/usdc.svg", address: "0x" },
+  { network: "Ethereum", name: "Tether", symbol: "USDT", icon: "/assets/tether.webp", address: "0x" },
+  { network: "Ethereum", name: "Savings DAI", symbol: "sDAI", icon: "/assets/savings-dai.svg", address: "0x" },
+  { network: "Ethereum", name: "Pendle rswETH", symbol: "PT-rswETH", icon: "/assets/pendle.webp", address: "0x" },
+  { network: "Ethereum", name: "Pendle weETH", symbol: "PT-weETH", icon: "/assets/pendle.webp", address: "0x" },
+  { network: "Ethereum", name: "Pendle rsETH", symbol: "PT-rsETH", icon: "/assets/pendle.webp", address: "0x" },
+  { network: "Ethereum", name: "Wrapped Bitcoin", symbol: "wBTC", icon: "/assets/wbtc.webp", address: "0x" },
 ];
 
 export interface Network {
@@ -46,6 +90,7 @@ export interface Network {
 export interface Asset {
   network: string;
   name: string;
+  symbol: string;
   icon?: string;
   address?: `0x${string}`;
 }
@@ -79,6 +124,7 @@ const StakingBox: React.FC<Props> = ({ walletBalance }) => {
             selectedNetwork={selectedNetwork}
             setSelectedNetwork={setSelectedNetwork}
             networkList={networkList}
+            from={true}
           />
         </div>
         <div className="flex mb-4 mt-3 border border-black px-4">

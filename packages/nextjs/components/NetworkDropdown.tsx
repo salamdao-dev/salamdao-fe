@@ -7,9 +7,10 @@ type NetworkDropdownProps = {
   selectedNetwork: Network;
   setSelectedNetwork: (network: Network) => void;
   networkList: Network[];
+  from: boolean;
 };
 
-const NetworkDropdown = ({ selectedNetwork, setSelectedNetwork, networkList }: NetworkDropdownProps) => {
+const NetworkDropdown = ({ selectedNetwork, setSelectedNetwork, networkList, from }: NetworkDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   // const [selectedNetwork, setSelectedNetwork] = useState<Network | null>(networkList[0]);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -47,7 +48,7 @@ const NetworkDropdown = ({ selectedNetwork, setSelectedNetwork, networkList }: N
           <img src={selectedNetwork.icon} alt={selectedNetwork.name} className="w-8 h-8 mr-4" />
         )}
         <div className="flex flex-col items-start">
-          <span className="text-xs select-none">From</span>
+          <span className="text-xs select-none">{from ? "From" : "To"}</span>
           <span className="text-xl select-none">{selectedNetwork ? selectedNetwork.name : "Select Network"}</span>
         </div>
         <div className="pr-2">
