@@ -16,7 +16,9 @@ export const WrongNetworkDropdown = () => {
         className="dropdown-toggle flex flex-row border border-2 border-orange-500 py-2 px-4 cursor-pointer hover:bg-white/[.1] transition duration-300"
       >
         wrong network
-        <ChevronDownIcon className="h-6 w-4 ml-2" />
+        <div className="pr-2">
+          <ChevronDownIcon className="h-6 w-4 ml-2" />
+        </div>
       </div>
       <ul
         tabIndex={0}

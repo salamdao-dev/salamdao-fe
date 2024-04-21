@@ -50,7 +50,9 @@ const AssetDropdown = ({ selectedAsset, setSelectedAsset, assetList }: AssetDrop
         <div className="flex flex-col">
           <span className="text-sm select-none">{selectedAsset ? selectedAsset.name : "Select Asset"}</span>
         </div>
-        <ChevronResponsive isOpen={isOpen} />
+        <div className="pr-2">
+          <ChevronResponsive isOpen={isOpen} />
+        </div>
       </div>
       {isOpen && (
         <div className="absolute bg-[#cebdba] shadow-md rounded mt-[3.5rem] w-48 z-10 cursor-pointer max-h-[25rem] overflow-scroll">

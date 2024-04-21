@@ -52,7 +52,9 @@ export const AddressInfoDropdown = ({
           <span className="ml-2 mr-1">
             {isENS(displayName) ? displayName : checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}
           </span>
-          <ChevronDownIcon className="h-6 w-4 ml-2 sm:ml-0" />
+          <div className="pr-2">
+            <ChevronDownIcon className="h-6 w-4 ml-2 sm:ml-0" />
+          </div>
         </summary>
         <ul
           tabIndex={0}
