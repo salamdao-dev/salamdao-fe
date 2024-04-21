@@ -50,7 +50,9 @@ const NetworkDropdown = ({ selectedNetwork, setSelectedNetwork, networkList }: N
           <span className="text-xs select-none">From</span>
           <span className="text-xl select-none">{selectedNetwork ? selectedNetwork.name : "Select Network"}</span>
         </div>
-        <ChevronResponsive isOpen={isOpen} />
+        <div className="pr-2">
+          <ChevronResponsive isOpen={isOpen} />
+        </div>
       </div>
       {isOpen && (
         <div className="absolute bg-[#cebdba] shadow-md rounded mt-2 w-48 z-10 cursor-pointer">
