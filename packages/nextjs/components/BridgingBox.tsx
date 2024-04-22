@@ -7,14 +7,14 @@ import { useTheme } from "next-themes";
 const networkList: Network[] = [
   { id: 1, name: "Ethereum", icon: "/networks/eth.svg" },
   { id: 2, name: "Arbitrum", icon: "/networks/arbitrum.svg" },
-  { id: 3, name: "K2", icon: "/networks/karak.svg" },
+  { id: 2410, name: "K2", icon: "/networks/karak.svg" },
 ];
 
 const assetList: Asset[] = [
-  { network: "Ethereum", name: "Ether", symbol: "ETH", icon: "/assets/eth.svg", address: "0x1234567890abcdef" },
-  { network: "Ethereum", name: "USDC", symbol: "USDC", icon: "/assets/usdc.svg", address: "0x1234567890abcdef" },
+  { network: 1, name: "Ether", symbol: "ETH", icon: "/assets/eth.svg", address: "0x1234567890abcdef" },
+  { network: 1, name: "USDC", symbol: "USDC", icon: "/assets/usdc.svg", address: "0x1234567890abcdef" },
   {
-    network: "Ethereum",
+    network: 1,
     name: "Restaked Swell ETH",
     symbol: "rswETH",
     icon: "/assets/restaked-swell-eth.svg",
@@ -33,7 +33,6 @@ const BridgingBox: React.FC<Props> = ({ walletBalance }) => {
   const [selectedFromAsset, setSelectedFromAsset] = useState<Asset>(assetList[0]);
 
   const [selectedToNetwork, setSelectedToNetwork] = useState<Network>(networkList[2]);
-  const [selectedToAsset, setSelectedToAsset] = useState<Asset>(assetList[0]);
 
   const [stakeAmount, setStakeAmount] = useState<number | string>(0);
 
@@ -63,6 +62,7 @@ const BridgingBox: React.FC<Props> = ({ walletBalance }) => {
             selectedAsset={selectedFromAsset}
             setSelectedAsset={setSelectedFromAsset}
             assetList={assetList}
+            disableDropdown={false}
           />
           <div className="flex flex-row flex-2 ml-10">
             <input
@@ -129,7 +129,14 @@ const BridgingBox: React.FC<Props> = ({ walletBalance }) => {
           />
         </div>
         <div className="flex mb-4 mt-3 border border-black px-4">
-          <AssetDropdown selectedAsset={selectedToAsset} setSelectedAsset={setSelectedToAsset} assetList={assetList} />
+          <AssetDropdown
+            selectedAsset={selectedFromAsset}
+            setSelectedAsset={() => {
+              return;
+            }}
+            assetList={assetList}
+            disableDropdown={true}
+          />
           <div className="flex flex-row flex-2 ml-10">
             <input
               type="string"
@@ -137,14 +144,7 @@ const BridgingBox: React.FC<Props> = ({ walletBalance }) => {
               onChange={handleStakeAmountChange}
               className="w-full h-full border-0 bg-transparent text-2xl p-2 focus:ring-0 focus:ring-offset-0 focus:outline-0"
             />
-            <div
-              onClick={() => setStakeAmount(walletBalance)}
-              className={`mt-auto mb-auto cursor-pointer ml-2 bg-left-bottom bg-gradient-to-r ${
-                theme === "dark" ? "from-white to-white" : "from-black to-black"
-              } bg-[length:0%_1px] bg-no-repeat hover:bg-[length:100%_1px] transition-all duration-300 ease-out`}
-            >
-              MAX
-            </div>
+            <div className="w-10" />
           </div>
         </div>
       </div>
