@@ -11,7 +11,7 @@
     "serve": "next start",
     "start": "next dev",
     "vercel": "vercel",
-    "vercel-build": "yarn install && next build",
+    "vercel:build": "yarn install && next build",
     "vercel:yolo": "vercel --build-env NEXT_PUBLIC_IGNORE_BUILD_ERROR=true"
   },
   "dependencies": {
@@ -23,13 +23,13 @@
     "@uniswap/v2-sdk": "~3.0.1",
     "axios": "^1.6.8",
     "blo": "~1.0.1",
-    "csstype": "^3.1.0",
     "daisyui": "4.5.0",
     "decimal.js": "^10.4.3",
     "next": "~14.0.4",
     "next-themes": "~0.2.1",
     "nprogress": "~0.2.0",
     "postcss": "^8.4.38",
+    "csstype": "^3.1.0",
     "qrcode.react": "~3.1.0",
     "react": "^18.3.1",
     "react-copy-to-clipboard": "~5.1.0",
