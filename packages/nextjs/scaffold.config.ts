@@ -22,6 +22,12 @@ const karak = {
       http: ["https://rpc.karak.network"],
     },
   },
+  contracts: {
+    multicall3: {
+      address: "0x73331e33f1552E706D56aa453ce19BCE314B4F59",
+      blockCreated: 0,
+    },
+  },
 };
 
 const scaffoldConfig = {

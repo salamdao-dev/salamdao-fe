@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Network } from "../types/utils";
 import ChevronResponsive from "./ChevronResponsive";
-import { Network } from "./StakingBox";
 import { useTheme } from "next-themes";
 
 type NetworkDropdownProps = {

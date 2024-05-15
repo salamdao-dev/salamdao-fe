@@ -8,11 +8,9 @@ import {
   ArrowTopRightOnSquareIcon,
   ArrowsRightLeftIcon,
   CheckCircleIcon,
-  ChevronDownIcon,
   DocumentDuplicateIcon,
   QrCodeIcon,
 } from "@heroicons/react/24/outline";
-import { BlockieAvatar, isENS } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 import { getTargetNetworks } from "~~/utils/scaffold-eth";
 
@@ -25,17 +23,11 @@ type AddressInfoDropdownProps = {
   ensAvatar?: string;
 };
 
-export const AddressInfoDropdown = ({
-  address,
-  ensAvatar,
-  displayName,
-  blockExplorerAddressLink,
-}: AddressInfoDropdownProps) => {
+export const AddressInfoDropdown = ({ address, blockExplorerAddressLink }: AddressInfoDropdownProps) => {
   const { disconnect } = useDisconnect();
   const checkSumAddress = getAddress(address);
 
   const [addressCopied, setAddressCopied] = useState(false);
-
   const [selectingNetwork, setSelectingNetwork] = useState(false);
   const dropdownRef = useRef<HTMLDetailsElement>(null);
   const closeDropdown = () => {
@@ -47,23 +39,17 @@ export const AddressInfoDropdown = ({
   return (
     <>
       <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
-        <summary tabIndex={0} className="btn btn-secondary btn-sm pl-0 pr-2 shadow-md dropdown-toggle gap-0 !h-auto">
-          <BlockieAvatar address={checkSumAddress} size={30} ensImage={ensAvatar} />
-          <span className="ml-2 mr-1">
-            {isENS(displayName) ? displayName : checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}
-          </span>
-          <div className="pr-2">
-            <ChevronDownIcon className="h-6 w-4 ml-2 sm:ml-0" />
-          </div>
-        </summary>
-        <ul
+        <summary
           tabIndex={0}
-          className="dropdown-content menu z-[2] p-2 mt-2 shadow-center shadow-accent bg-base-200 rounded-box gap-1"
+          className="btn btn-sm  bg-[#ff6a48] hover:bg-[#ff6a48]/[0.7] rounded-none border-0 pl-0 pr-2 dropdown-toggle gap-0 !h-auto"
         >
+          <span className="ml-2 mr-1">{checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}</span>
+        </summary>
+        <ul tabIndex={0} className="dropdown-content menu z-[2] p-2 mt-2 bg-base-200 rounded-none gap-1">
           <NetworkOptions hidden={!selectingNetwork} />
           <li className={selectingNetwork ? "hidden" : ""}>
             {addressCopied ? (
-              <div className="btn-sm !rounded-xl flex gap-3 py-3">
+              <div className="btn-sm !rounded-none flex gap-3 py-3">
                 <CheckCircleIcon
                   className="text-xl font-normal h-6 w-4 cursor-pointer ml-2 sm:ml-0"
                   aria-hidden="true"
@@ -80,7 +66,7 @@ export const AddressInfoDropdown = ({
                   }, 800);
                 }}
               >
-                <div className="btn-sm !rounded-xl flex gap-3 py-3">
+                <div className="btn-sm !rounded-none flex gap-3 py-3">
                   <DocumentDuplicateIcon
                     className="text-xl font-normal h-6 w-4 cursor-pointer ml-2 sm:ml-0"
                     aria-hidden="true"
@@ -91,13 +77,13 @@ export const AddressInfoDropdown = ({
             )}
           </li>
           <li className={selectingNetwork ? "hidden" : ""}>
-            <label htmlFor="qrcode-modal" className="btn-sm !rounded-xl flex gap-3 py-3">
+            <label htmlFor="qrcode-modal" className="btn-sm !rounded-none flex gap-3 py-3">
               <QrCodeIcon className="h-6 w-4 ml-2 sm:ml-0" />
               <span className="whitespace-nowrap">View QR Code</span>
             </label>
           </li>
           <li className={selectingNetwork ? "hidden" : ""}>
-            <button className="menu-item btn-sm !rounded-xl flex gap-3 py-3" type="button">
+            <button className="menu-item btn-sm !rounded-none flex gap-3 py-3" type="button">
               <ArrowTopRightOnSquareIcon className="h-6 w-4 ml-2 sm:ml-0" />
               <a
                 target="_blank"
@@ -112,7 +98,7 @@ export const AddressInfoDropdown = ({
           {allowedNetworks.length > 1 ? (
             <li className={selectingNetwork ? "hidden" : ""}>
               <button
-                className="btn-sm !rounded-xl flex gap-3 py-3"
+                className="btn-sm !rounded-none flex gap-3 py-3"
                 type="button"
                 onClick={() => {
                   setSelectingNetwork(true);
@@ -124,7 +110,7 @@ export const AddressInfoDropdown = ({
           ) : null}
           <li className={selectingNetwork ? "hidden" : ""}>
             <button
-              className="menu-item text-error btn-sm !rounded-xl flex gap-3 py-3"
+              className="menu-item text-error btn-sm !rounded-none flex gap-3 py-3"
               type="button"
               onClick={() => disconnect()}
             >

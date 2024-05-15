@@ -1,10 +1,23 @@
 "use client";
 
+import { useMemo } from "react";
 import StakingBox from "../components/StakingBox";
 import type { NextPage } from "next";
+import { useAccount } from "wagmi";
+import { useGlobalState } from "~~/services/store/store";
 
 const Home: NextPage = () => {
-  // const { address: connectedAddress } = useAccount();
+  const { selectedAsset, canStake, stakeAmount } = useGlobalState();
+  const { address: connectedAddress } = useAccount();
+
+  const getStakeButtonMessage = useMemo(() => {
+    if (connectedAddress === undefined) return "CONNECT WALLET";
+    if (stakeAmount === "0" || stakeAmount === "") return "ENTER AMOUNT";
+    if (canStake) return "STAKE";
+    return "";
+  }, [connectedAddress, stakeAmount, canStake]);
+
+  const { symbol, description, link } = selectedAsset;
 
   return (
     <>
@@ -15,17 +28,29 @@ const Home: NextPage = () => {
           <div>
             Earn Karak XP and potentially ETH staking rewards + Restaking Rewards + Eigenlayer Points + LRT Points
           </div>
-          {/* TODO: Make this a dynamic component based on what is selected in the staking component */}
-          <div className="italic font-bold text-[2rem] text-[#ff6a48] pt-8 pb-8">wstETH?</div>
-          <div>
-            wstETH is a wrapped stETH token that is used to stake on the Karak network. It can be traded on
-            decentralized exchanges like Balancer V2, UniswapV3 and Astroport.
-          </div>
+          <div className="italic font-bold text-[2rem] text-[#ff6a48] pt-8 pb-8">{symbol}</div>
+          <div>{description}</div>
+          {link && (
+            <a href={link} className="mt-12 relative" target="_blank" rel="noreferrer">
+              Find Out More On Coingecko
+            </a>
+          )}
         </div>
         <div className="flex flex-col">
-          <StakingBox networks={["Ethereum", "Arbitrum", "K2"]} assets={["wstETH", "ETH"]} walletBalance={2.03} />
+          <StakingBox />
           <div className="flex flex-row justify-end text-xs w-full">14 day period to unstake</div>
-          <div className="w-full bg-[#ff6a48] mt-4 py-2 text-center">STAKE</div>
+          <div
+            className={`
+            w-full mt-4 py-2 text-center transition duration-300 
+            ${
+              canStake
+                ? "bg-[#ff6a48] hover:bg-[#ff6a48]/[0.7] cursor-pointer"
+                : "bg-[#8e8b87] cursor-not-allowed text-black/[.8]"
+            }
+          `}
+          >
+            {getStakeButtonMessage}
+          </div>
         </div>
       </div>
     </>

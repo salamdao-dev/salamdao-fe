@@ -35,10 +35,9 @@ p {
   @apply shadow-none;
 }
 
-
 #pattern {
   margin-top: -4.9rem;
-  height: 100vh;
+  min-height: 100vh;
   position: absolute;
   z-index: -100;
   top: 0;

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Asset } from "../types/utils";
 import ChevronResponsive from "./ChevronResponsive";
-import { Asset } from "./StakingBox";
 import { useTheme } from "next-themes";
 
 type AssetDropdownProps = {
@@ -59,12 +59,12 @@ const AssetDropdown = ({ selectedAsset, setSelectedAsset, assetList, disableDrop
         )}
       </div>
       {isOpen && (
-        <div className="absolute bg-[#cebdba] shadow-md rounded mt-2 w-48 z-10">
+        <div className="absolute bg-[#cebdba] shadow-md rounded mt-2 w-[13.9rem] z-10">
           <div className="max-h-[25rem] overflow-auto custom-scroll">
             <div className="py-1 relative">
-              {assetList.map(asset => (
+              {assetList.map((asset, index) => (
                 <div
-                  key={asset.name}
+                  key={`${asset.name}-${asset.symbol}-${index}`}
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200 hover:bg-opacity-80"
                   onClick={() => handleAssetChange(asset)}
                 >

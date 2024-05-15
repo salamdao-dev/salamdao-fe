@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 
 type HeaderMenuLink = {
@@ -21,11 +21,15 @@ export const menuLinks: HeaderMenuLink[] = [
   },
   {
     label: "bridge",
-    href: "/bridge",
+    href: "https://karak.network/bridge",
   },
   {
     label: "dashboard",
     href: "/dashboard",
+  },
+  {
+    label: "salamels",
+    href: "/salamels",
   },
 ];
 
@@ -41,6 +45,7 @@ export const HeaderMenuLinks = () => {
           <Link
             href={href}
             key={href}
+            target={href.startsWith("http") ? "_blank" : undefined}
             className="group transition-all duration-300 ease-in-out px-4 cursor-pointer text-[2rem]"
           >
             <span
@@ -114,7 +119,6 @@ export const Header = () => {
       </div>
       <div className="mr-4">
         <RainbowKitCustomConnectButton />
-        <FaucetButton />
       </div>
     </div>
   );
