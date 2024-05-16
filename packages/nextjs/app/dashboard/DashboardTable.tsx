@@ -14,7 +14,7 @@ const DashboardTable = ({ dashboardData }: { dashboardData: Record<string, any> 
 
   return (
     <div className="relative mx-4 md:mx-12">
-      <div className="mt-[10rem] border border-black overflow-hidden">
+      <div className="mt-[3rem] xl:mt-[10rem] border border-black overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-[#cebdba] sticky top-0">
@@ -35,7 +35,7 @@ const DashboardTable = ({ dashboardData }: { dashboardData: Record<string, any> 
             </thead>
           </table>
         </div>
-        <div className="max-h-[500px] overflow-y-auto">
+        <div className="max-h-[60vh] overflow-y-auto">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <tbody>
