@@ -67,23 +67,3 @@ p {
   /* Visible but not overpowering */
   border-radius: 10px;
 }
-
-@media (max-width: 1160px) {
-  .custom-menu {
-    display: none;
-  }
-
-  .custom-dropdown {
-    display: block;
-  }
-}
-
-@media (min-width: 1161px) {
-  .custom-menu {
-    display: flex;
-  }
-
-  .custom-dropdown {
-    display: none;
-  }
-}
