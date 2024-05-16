@@ -38,7 +38,7 @@ export const HeaderMenuLinks = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-row w-full items-center">
+    <div className="flex flex-row w-full items-center space-x-4">
       {menuLinks.map(({ label, href }) => {
         const isActive = pathname === href;
         return (
@@ -46,7 +46,7 @@ export const HeaderMenuLinks = () => {
             href={href}
             key={href}
             target={href.startsWith("http") ? "_blank" : undefined}
-            className="group transition-all duration-300 ease-in-out px-4 cursor-pointer text-[2rem]"
+            className="group transition-all duration-300 ease-in-out cursor-pointer text-sm sm:text-base md:text-lg lg:text-3xl"
           >
             <span
               className={
@@ -79,9 +79,9 @@ export const Header = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="relative sticky lg:static top-0 navbar min-h-0 justify-between z-21 px-0 sm:px-2">
-      <div className="navbar-start w-full">
-        <div className="lg:hidden dropdown" ref={burgerMenuRef}>
+    <div className="relative sticky lg:static top-0 navbar min-h-0 justify-between z-21 px-4 sm:px-6 lg:px-8">
+      <div className="flex w-full items-center justify-between">
+        <div className="lg:hidden" ref={burgerMenuRef}>
           <label
             tabIndex={0}
             className={`ml-1 btn btn-ghost ${isDrawerOpen ? "hover:bg-secondary" : "hover:bg-transparent"}`}
@@ -89,7 +89,7 @@ export const Header = () => {
               setIsDrawerOpen(prevIsOpenState => !prevIsOpenState);
             }}
           >
-            <Bars3Icon className="h-1/2" />
+            <Bars3Icon className="h-6 w-6" />
           </label>
           {isDrawerOpen && (
             <ul
@@ -103,8 +103,8 @@ export const Header = () => {
             </ul>
           )}
         </div>
-        <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-[20rem] h-[4rem] ml-8">
+        <Link href="/" passHref className="flex items-center gap-2 ml-4 mr-6 shrink-0">
+          <div className="flex relative w-[8rem] h-[2rem] sm:w-[10rem] sm:h-[2.5rem] md:w-[12rem] md:h-[3rem] lg:w-[15rem] lg:h-[3.5rem] xl:w-[20rem] xl:h-[4rem]">
             <Image
               alt="Salam logo"
               className="cursor-pointer"
@@ -113,12 +113,12 @@ export const Header = () => {
             />
           </div>
         </Link>
-        <ul className="hidden lg:flex lg:flex-row lg:flex-nowrap pr-[12rem] mx-auto">
+        <div className="hidden lg:flex lg:flex-row lg:flex-nowrap mx-auto">
           <HeaderMenuLinks />
-        </ul>
-      </div>
-      <div className="mr-4">
-        <RainbowKitCustomConnectButton />
+        </div>
+        <div className="mr-4">
+          <RainbowKitCustomConnectButton />
+        </div>
       </div>
     </div>
   );

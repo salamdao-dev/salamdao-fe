@@ -81,7 +81,9 @@ const StakingBox: React.FC = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className={`border-2 p-4 ${theme && theme === "dark" ? "border-white" : "border-black bg-[#cebdba]"}`}>
+      <div
+        className={`border-2 p-4 w-full ${theme && theme === "dark" ? "border-white" : "border-black bg-[#cebdba]"}`}
+      >
         <div className="w-full">
           <NetworkDropdown
             selectedNetwork={selectedNetwork}
