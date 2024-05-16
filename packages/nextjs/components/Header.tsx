@@ -79,7 +79,7 @@ export const Header = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="relative sticky lg:static top-0 navbar min-h-0 justify-between z-21 px-4 sm:px-6 lg:px-8">
+    <div className="relative lg:static top-0 navbar min-h-0 justify-between z-21 px-4 sm:px-6 lg:px-8">
       <div className="flex w-full items-center justify-between">
         <div className="lg:hidden" ref={burgerMenuRef}>
           <label
@@ -94,7 +94,7 @@ export const Header = () => {
           {isDrawerOpen && (
             <ul
               tabIndex={0}
-              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box fixed"
+              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-fit absolute z-20"
               onClick={() => {
                 setIsDrawerOpen(false);
               }}
