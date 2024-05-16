@@ -30,7 +30,7 @@ const Home: NextPage = () => {
           <div className="italic font-bold text-2xl text-[#ff6a48] pt-8 pb-8">{symbol}</div>
           <div>{description}</div>
           {link && (
-            <a href={link} className="mt-12 relative" target="_blank" rel="noreferrer">
+            <a href={link} className="mt-12 relative underline pb-[3rem] lg:pb-0" target="_blank" rel="noreferrer">
               Find Out More On Coingecko
             </a>
           )}
@@ -39,7 +39,7 @@ const Home: NextPage = () => {
           <div className="w-full flex flex-col items-center">
             <div className={`w-full `}>
               <StakingBox />
-              <div className="flex flex-row justify-end text-xs w-full mt-2 lg:mt-4">14 day period to unstake</div>
+              <div className="flex flex-row justify-end text-xs w-full mt-2 lg:mt-4">7 day period to unstake</div>
               <div
                 className={`
                   w-full mt-4 py-2 text-center transition duration-300 
