@@ -158,7 +158,7 @@ export const assetList: Asset[] = [
     network: 1,
     name: "Eigenpie swETH",
     symbol: "mswETH",
-    icon: "/assets/magpie.png",
+    icon: "/assets/eigenpie.png",
     address: "0x32bd822d615A3658A68b6fDD30c2fcb2C996D678",
     vault: "0x6928e5947E5a9E8E57Da66121037c7E8dA3a5b30",
     decimals: 18,
@@ -170,24 +170,24 @@ export const assetList: Asset[] = [
     network: 1,
     name: "Eigenpie stETH",
     symbol: "mstETH",
-    icon: "/assets/magpie.png",
+    icon: "/assets/eigenpie.png",
     address: "0x49446A0874197839D15395B908328a74ccc96Bc0",
     vault: "0x3d9eBe3161778C4831f6F7A6d9263F031285F976",
     decimals: 18,
     description:
-      "Magpie stETH is a token that represents stETH on the Magpie platform, offering users the opportunity to earn rewards through staking.",
+      "Eigenpie stETH is a token that represents stETH on the Magpie platform, offering users the opportunity to earn rewards through staking.",
     link: "https://www.coingecko.com/en/coins/eigenpie-msteth",
   },
   {
     network: 1,
     name: "Eigenpie wBETH",
     symbol: "mwBETH",
-    icon: "/assets/magpie.png",
+    icon: "/assets/eigenpie.png",
     address: "0xE46a5E19B19711332e33F33c2DB3eA143e86Bc10",
     vault: "0x51e0f3DA45eF8388FcD5F69A185DA4AEc931A538",
     decimals: 18,
     description:
-      "Magpie wBETH is a token that represents wrapped ETH on the Magpie platform, offering users the opportunity to earn rewards through staking.",
+      "Eigenpie wBETH is a token that represents wrapped ETH on the Magpie platform, offering users the opportunity to earn rewards through staking.",
     link: "https://www.coingecko.com/en/coins/eigenpie-wbeth",
   },
   {
@@ -259,7 +259,7 @@ export const assetList: Asset[] = [
   },
   {
     network: 1,
-    name: "Pendle weETH",
+    name: "Pendle ether.fi weETH",
     symbol: "PT-weETH-JUN27",
     icon: "/assets/pendle.webp",
     address: "0xc69Ad9baB1dEE23F4605a82b3354F8E40d1E5966",
@@ -269,7 +269,7 @@ export const assetList: Asset[] = [
   },
   {
     network: 1,
-    name: "Pendle rsETH",
+    name: "Pendle Kelp rsETH",
     symbol: "PT-rsETH-JUN27",
     icon: "/assets/pendle.webp",
     address: "0xB05cABCd99cf9a73b19805edefC5f67CA5d1895E",
@@ -279,7 +279,7 @@ export const assetList: Asset[] = [
   },
   {
     network: 1,
-    name: "Pendle weETH - DEC-26",
+    name: "Pendle ether.fi weETH - DEC-26",
     symbol: "PT-weETH-DEC26",
     icon: "/assets/pendle.webp",
     address: "0x6ee2b5E19ECBa773a352E5B21415Dc419A700d1d",
@@ -355,8 +355,8 @@ export const assetList: Asset[] = [
   },
   {
     network: 42161,
-    name: "Pendle eETH 6/27",
-    symbol: "PT-eETH-JUN27",
+    name: "Pendle weETH 6/27",
+    symbol: "PT-weETH-JUN27",
     icon: "/assets/pendle.webp",
     address: "0x1c27Ad8a19Ba026ADaBD615F6Bc77158130cfBE4",
     vault: "0x8cF4494C510ef55f0B2a4722450b8bddc9acB5D4",
@@ -375,7 +375,7 @@ export const assetList: Asset[] = [
   },
   {
     network: 42161,
-    name: "Pendle ezETH 6/27",
+    name: "Pendle Renzo ezETH 6/27",
     symbol: "PT-ezETH-JUN27",
     icon: "/assets/pendle.webp",
     address: "0x8EA5040d423410f1fdc363379Af88e1DB5eA1C34",
@@ -422,3 +422,7 @@ export const assetList: Asset[] = [
 export const assetMap: Record<`0x${string}`, Asset> = {};
 
 assetList.forEach(asset => (assetMap[asset.address] = asset));
+
+export const vaultMap: Record<`0x${string}`, Asset> = {};
+
+assetList.forEach(asset => (vaultMap[asset.vault] = asset));

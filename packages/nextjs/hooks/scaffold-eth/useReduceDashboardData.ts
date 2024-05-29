@@ -26,9 +26,7 @@ export const useReduceDashboardData = () => {
         if (vaultBalances) {
           for (const asset in vaultBalances[chainId]) {
             if (asset === zeroAddress) continue;
-            console.log("asset", asset);
             const addressString: `0x${string}` = asset as `0x${string}`;
-            console.log("addressString", addressString);
             for (const vault in vaultBalances[chainId][addressString]) {
               const vaultBalance = vaultBalances[chainId][addressString][vault];
               data[addressString] = {

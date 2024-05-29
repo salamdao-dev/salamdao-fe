@@ -117,7 +117,9 @@ export const Header = () => {
           <HeaderMenuLinks />
         </div>
         <div className="w-1/6 text-right">
-          <RainbowKitCustomConnectButton />
+          <div>
+            <RainbowKitCustomConnectButton />
+          </div>
         </div>
       </div>
     </div>

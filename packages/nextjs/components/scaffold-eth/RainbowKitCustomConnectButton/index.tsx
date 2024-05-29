@@ -155,7 +155,7 @@ export const RainbowKitCustomConnectButton = () => {
           <>
             {!connected ? (
               <div
-                className="border border-2 border-orange-500 py-2 px-4 cursor-pointer hover:bg-white/[.1] transition duration-300"
+                className="w-fit ml-auto border border-2 border-orange-500 py-2 px-4 cursor-pointer hover:bg-white/[.1] transition duration-300"
                 onClick={openConnectModal}
               >
                 connect

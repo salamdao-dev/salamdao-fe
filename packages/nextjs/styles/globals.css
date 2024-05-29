@@ -74,7 +74,7 @@ p {
   left: 0;
   height: 100vh;
   width: 100vw;
-  background: url('/nft/ultrawide-background.gif') no-repeat center center fixed;
+  background: url("/nft/ultrawide-background.gif") no-repeat center center fixed;
   background-size: cover;
   overflow: hidden;
   z-index: -1;
