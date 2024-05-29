@@ -3,6 +3,8 @@ import { assetList } from "../../utils/constants";
 import { readContracts } from "@wagmi/core";
 import { zeroAddress } from "viem";
 import externalContracts from "~~/contracts/externalContracts";
+import { mainRPCs } from "~~/services/web3/chainData";
+import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 export function useVaultBalances(account: `0x${string}`) {
   const fetchVaultBalances = useCallback(async () => {
@@ -13,9 +15,9 @@ export function useVaultBalances(account: `0x${string}`) {
 
     const readData = uniqueChainIds.map(chainId => {
       return {
-        chainId,
-        address: externalContracts[chainId].VaultSupervisor.address,
-        abi: externalContracts[chainId].VaultSupervisor.abi,
+        chainId: chainId as keyof typeof mainRPCs,
+        address: externalContracts[chainId as keyof typeof mainRPCs].VaultSupervisor.address,
+        abi: externalContracts[chainId as keyof typeof mainRPCs].VaultSupervisor.abi,
         functionName: "getDeposits",
         args: [account],
       };
@@ -23,7 +25,7 @@ export function useVaultBalances(account: `0x${string}`) {
 
     const finalData: Record<number, Record<string, Record<string, bigint>>> = {};
 
-    const results = await readContracts({ contracts: readData });
+    const results = await readContracts(wagmiConfig, { contracts: readData });
     for (let i = 0; i < results.length; i++) {
       const { result, status } = results[i];
       if (!status || !result) {

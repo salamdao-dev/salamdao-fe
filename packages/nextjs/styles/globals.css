@@ -34,6 +34,8 @@ p {
 
 .background-combo {
   position: fixed;
+  top: 0;
+  left: 0;
   background-image: linear-gradient(to top, #cebdba, #dbcfcc);
   height: 100vh;
   width: 100%;
@@ -59,11 +61,21 @@ p {
 
 .custom-scroll::-webkit-scrollbar-track {
   background: transparent;
-  /* Clean background */
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
   background-color: rgba(75, 75, 75, 0.5);
-  /* Visible but not overpowering */
   border-radius: 10px;
+}
+
+.salamels-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: url('/nft/ultrawide-background.gif') no-repeat center center fixed;
+  background-size: cover;
+  overflow: hidden;
+  z-index: -1;
 }

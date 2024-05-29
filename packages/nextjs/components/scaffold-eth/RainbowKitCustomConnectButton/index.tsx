@@ -10,13 +10,12 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import axios from "axios";
 import { Address, zeroAddress } from "viem";
 import { useAccount, useSignMessage } from "wagmi";
-import { useAutoConnect } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { useGlobalState } from "~~/services/store/store";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
 
 export const RainbowKitCustomConnectButton = () => {
-  useAutoConnect();
+  // useAutoConnect();
   const { targetNetwork } = useTargetNetwork();
   const { signMessage, data: signMessageData } = useSignMessage();
   const { address: connectedAddress } = useAccount();
@@ -24,7 +23,14 @@ export const RainbowKitCustomConnectButton = () => {
     ? getBlockExplorerAddressLink(targetNetwork, connectedAddress)
     : undefined;
 
-  const { setVaultBalances, referrals, nonce, setNonce, setReferrals, setTokenBalances } = useGlobalState.getState();
+  const { setVaultBalances, referrals, nonce, setNonce, setReferrals, setTokenBalances } = useGlobalState(state => ({
+    setVaultBalances: state.setVaultBalances,
+    referrals: state.referrals,
+    nonce: state.nonce,
+    setNonce: state.setNonce,
+    setReferrals: state.setReferrals,
+    setTokenBalances: state.setTokenBalances,
+  }));
 
   const fetchBalances = useTokenBalances(connectedAddress as `0x${string}`);
   const fetchVaultBalances = useVaultBalances((connectedAddress as `0x${string}`) ?? zeroAddress);
@@ -95,6 +101,7 @@ export const RainbowKitCustomConnectButton = () => {
 
     const updateBalances = async () => {
       const balances = await fetchBalances();
+      console.log(balances);
       const vaultBalances = await fetchVaultBalances();
       setTokenBalances(balances);
       setVaultBalances(vaultBalances);
@@ -102,9 +109,9 @@ export const RainbowKitCustomConnectButton = () => {
 
     updateBalances();
 
-    const intervalId = setInterval(updateBalances, 60000); // Refresh once a minute
+    // const intervalId = setInterval(updateBalances, 60000); // Refresh once a minute
 
-    return () => clearInterval(intervalId);
+    // return () => clearInterval(intervalId);
   }, [connectedAddress, fetchBalances, fetchVaultBalances, setTokenBalances, setVaultBalances]);
 
   useEffect(() => {

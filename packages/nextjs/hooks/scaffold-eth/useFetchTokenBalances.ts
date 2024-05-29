@@ -2,6 +2,8 @@ import { useCallback, useMemo } from "react";
 import { multicall } from "@wagmi/core";
 import { Abi } from "viem";
 import ERC20 from "~~/contracts/abis/ERC20.json";
+import { mainRPCs } from "~~/services/web3/chainData";
+import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { ContractMapping } from "~~/types/utils";
 import { assetList } from "~~/utils/constants";
 
@@ -11,7 +13,7 @@ export function useTokenBalances(account: `0x${string}`) {
 
     return assetList.map(asset => ({
       contract: {
-        address: asset.address,
+        address: asset.address as `0x${string}`,
         abi: ERC20 as Abi,
         functionName: "balanceOf",
         args: [account],
@@ -27,7 +29,7 @@ export function useTokenBalances(account: `0x${string}`) {
     const uniqueChainIds = [...new Set(chainIds)];
 
     const chainIdToContracts = uniqueChainIds.map(chainId => ({
-      chainId,
+      chainId: chainId as keyof typeof mainRPCs,
       contracts: contractDetails.filter(detail => detail.chainId === chainId),
     }));
 
@@ -36,12 +38,17 @@ export function useTokenBalances(account: `0x${string}`) {
       balances[chainId] = {};
     }
 
+    console.log("chainIdToContracts", chainIdToContracts);
+
     await Promise.all(
       chainIdToContracts.map(async ({ chainId, contracts }) => {
         const contractsForChain = contracts.map(({ contract }) => contract);
 
         try {
-          const results = await multicall({ contracts: contractsForChain, chainId });
+          const results = await multicall(wagmiConfig, {
+            contracts: contractsForChain,
+            chainId,
+          });
 
           contractsForChain.map(
             (contract, index) => (balances[chainId][contract.address] = results[index].result ?? "0"),
@@ -53,6 +60,7 @@ export function useTokenBalances(account: `0x${string}`) {
         }
       }),
     );
+    console.log("balances", balances);
     return balances;
   }, [account]);
 

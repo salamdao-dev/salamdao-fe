@@ -24,7 +24,7 @@ const karak = {
   },
   contracts: {
     multicall3: {
-      address: "0x73331e33f1552E706D56aa453ce19BCE314B4F59",
+      address: "0x73331e33f1552E706D56aa453ce19BCE314B4F59" as `0x${string}`,
       blockCreated: 0,
     },
   },

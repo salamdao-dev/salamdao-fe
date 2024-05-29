@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
-import { useTheme } from "next-themes";
+import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
-import { WagmiConfig } from "wagmi";
+import { WagmiProvider } from "wagmi";
 import { Header } from "~~/components/Header";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
-import { appChains } from "~~/services/web3/wagmiConnectors";
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -20,22 +18,15 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const ScaffoldEthAppWithProviders = ({ children }: { children: React.ReactNode }) => {
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === "dark";
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const queryClient = new QueryClient();
 
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider
-        chains={appChains.chains}
-        theme={mounted ? (isDarkMode ? darkTheme() : lightTheme()) : lightTheme()}
-      >
-        <ScaffoldEthApp>{children}</ScaffoldEthApp>
-      </RainbowKitProvider>
-    </WagmiConfig>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider theme={lightTheme()}>
+          <ScaffoldEthApp>{children}</ScaffoldEthApp>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };

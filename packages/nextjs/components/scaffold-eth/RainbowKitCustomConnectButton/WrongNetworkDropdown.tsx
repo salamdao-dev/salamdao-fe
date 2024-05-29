@@ -7,10 +7,6 @@ export const WrongNetworkDropdown = () => {
 
   return (
     <div className="dropdown dropdown-end mr-2">
-      {/* <label tabIndex={0} className="btn btn-error btn-sm dropdown-toggle gap-1">
-        <span>Wrong network</span>
-        <ChevronDownIcon className="h-6 w-4 ml-2 sm:ml-0" />
-      </label> */}
       <div
         tabIndex={0}
         className="dropdown-toggle flex flex-row border border-2 border-orange-500 py-2 px-4 cursor-pointer hover:bg-white/[.1] transition duration-300"

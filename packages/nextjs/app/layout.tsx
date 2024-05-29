@@ -53,7 +53,6 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   return (
     <html suppressHydrationWarning>
       <body className={redHatMono.className}>
-        <div className="background-combo" />
         <ThemeProvider enableSystem={false}>
           <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
         </ThemeProvider>

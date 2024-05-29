@@ -19,26 +19,42 @@ export const useReduceDashboardData = () => {
 
   useEffect(() => {
     const data: Record<`0x${string}`, DashboardData> = {};
-    if (!vaultBalances) return;
-    for (const chain of Object.keys(vaultBalances)) {
+    if (!vaultBalances && !tokenBalances) return;
+    for (const chain of Object.keys(vaultBalances ?? {})) {
       if (!isNaN(chain as unknown as number)) {
         const chainId = parseInt(chain, 10);
-        for (const asset in vaultBalances[chainId]) {
+        if (vaultBalances) {
+          for (const asset in vaultBalances[chainId]) {
+            if (asset === zeroAddress) continue;
+            console.log("asset", asset);
+            const addressString: `0x${string}` = asset as `0x${string}`;
+            console.log("addressString", addressString);
+            for (const vault in vaultBalances[chainId][addressString]) {
+              const vaultBalance = vaultBalances[chainId][addressString][vault];
+              data[addressString] = {
+                ...data[addressString],
+                assetName: assetMap[addressString].name,
+                assetSymbol: assetMap[addressString].symbol,
+                chain: chainId,
+                vault: vault as `0x${string}`,
+                vaultBalance,
+                decimals: assetMap[addressString].decimals,
+              };
+            }
+          }
+        }
+        for (const asset in tokenBalances[chainId]) {
           if (asset === zeroAddress) continue;
           const addressString: `0x${string}` = asset as `0x${string}`;
-          for (const vault in vaultBalances[chainId][addressString]) {
-            const vaultBalance = vaultBalances[chainId][addressString][vault];
-            const tokenBalance = tokenBalances?.[chainId]?.[addressString] ?? BigInt(0);
-            data[addressString] = {
-              assetName: assetMap[addressString].name,
-              assetSymbol: assetMap[addressString].symbol,
-              chain: chainId,
-              vault: vault as `0x${string}`,
-              vaultBalance,
-              tokenBalance,
-              decimals: assetMap[addressString].decimals,
-            };
-          }
+          const tokenBalance = tokenBalances[chainId][addressString];
+          data[addressString] = {
+            ...data[addressString],
+            assetName: assetMap[addressString].name,
+            assetSymbol: assetMap[addressString].symbol,
+            chain: chainId,
+            tokenBalance,
+            decimals: assetMap[addressString].decimals,
+          };
         }
       }
     }

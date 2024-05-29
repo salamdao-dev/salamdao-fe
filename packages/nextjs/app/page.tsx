@@ -7,7 +7,11 @@ import { useAccount } from "wagmi";
 import { useGlobalState } from "~~/services/store/store";
 
 const Home: NextPage = () => {
-  const { selectedAsset, canStake, stakeAmount } = useGlobalState();
+  const { selectedAsset, canStake, stakeAmount } = useGlobalState(state => ({
+    selectedAsset: state.selectedAsset,
+    canStake: state.canStake,
+    stakeAmount: state.stakeAmount,
+  }));
   const { address: connectedAddress } = useAccount();
 
   const getStakeButtonMessage = useMemo(() => {
@@ -21,6 +25,7 @@ const Home: NextPage = () => {
 
   return (
     <>
+      <div className="background-combo" />
       <div className="flex flex-col-reverse lg:flex-row mx-4 md:mx-12 lg:mx-24 mt-12 lg:mt-[6rem]">
         <div className="w-full lg:w-3/5 lg:pr-[12rem]">
           <div className="italic font-bold text-2xl text-[#ff6a48] pb-8">WHY STAKING?</div>
@@ -49,6 +54,13 @@ const Home: NextPage = () => {
                       : "bg-[#8e8b87] cursor-not-allowed text-black/[.8]"
                   }
                 `}
+                onClick={() => {
+                  if (canStake) {
+                    const scaledNumber = BigInt(parseFloat(stakeAmount) * 10 ** selectedAsset.decimals);
+                    console.log("stakeAmount", stakeAmount);
+                    console.log("scaledNumber", scaledNumber);
+                  }
+                }}
               >
                 {getStakeButtonMessage}
               </div>

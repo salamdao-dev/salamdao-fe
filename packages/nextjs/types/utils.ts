@@ -33,7 +33,7 @@ export type ReferralData = {
 
 export type ContractMapping = {
   contract: {
-    address: string;
+    address: `0x${string}`;
     abi: Abi;
     functionName: string;
     args: unknown[];

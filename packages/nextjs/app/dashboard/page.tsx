@@ -8,7 +8,7 @@ const Dashboard = () => {
 
   return dashboardData ? (
     <>
-      <div id="pattern" />
+      <div className="background-combo" />
       <DashboardTable dashboardData={dashboardData} />
     </>
   ) : null;

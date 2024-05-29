@@ -107,7 +107,10 @@ const StakingBox: React.FC = () => {
               className="w-full h-full border-0 bg-transparent text-2xl p-2 focus:ring-0 focus:ring-offset-0 focus:outline-0"
             />
             <div
-              onClick={() => setStakeAmount(getWalletBalance(selectedAsset.address))}
+              onClick={() => {
+                setStakeAmount(getWalletBalance(selectedAsset.address));
+                setCanStake(true);
+              }}
               className={`mt-auto mb-auto cursor-pointer ml-2 bg-left-bottom bg-gradient-to-r ${
                 theme === "dark" ? "from-white to-white" : "from-black to-black"
               } bg-[length:0%_1px] bg-no-repeat hover:bg-[length:100%_1px] transition-all duration-300 ease-out`}
