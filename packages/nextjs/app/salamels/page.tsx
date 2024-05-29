@@ -79,6 +79,12 @@ const Salamels = () => {
           <div className="bg-red-500 max-w-[35rem] py-2 text-center hover:cursor-pointer hover:bg-red-400 transition duration-300 select-none">
             MINT
           </div>
+          <div className="max-w-[35rem] text-xl">
+            <div className="max-w-[15rem] flex flex-row justify-between mt-6 w-full mx-auto">
+              <div>MINTED</div>
+              <div>0/10000</div>
+            </div>
+          </div>
         </div>
       </div>
     </>
