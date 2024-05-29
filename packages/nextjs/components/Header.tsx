@@ -79,8 +79,8 @@ export const Header = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="relative lg:static top-0 navbar min-h-0 justify-between z-21 px-4 sm:px-6 lg:px-8">
-      <div className="flex w-full items-center justify-between">
+    <div className="w-full relative lg:static top-0 navbar min-h-0 justify-between z-21 px-4 sm:px-6 lg:px-8">
+      <div className="flex w-full items-center justify-between mx-auto">
         <div className="lg:hidden" ref={burgerMenuRef}>
           <label
             tabIndex={0}
@@ -103,8 +103,8 @@ export const Header = () => {
             </ul>
           )}
         </div>
-        <Link href="/" passHref className="flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-[8rem] h-[2rem] sm:w-[10rem] sm:h-[2.5rem] md:w-[12rem] md:h-[3rem] lg:w-[15rem] lg:h-[3.5rem] xl:w-[20rem] xl:h-[4rem]">
+        <Link href="/" passHref className="flex items-center shrink-0 w-1/6">
+          <div className="flex relative w-[8rem] h-[2rem] sm:w-[10rem] sm:h-[2.5rem] md:w-[12rem] md:h-[3rem] lg:w-[12rem] lg:h-[4rem]">
             <Image
               alt="Salam logo"
               className="cursor-pointer"
@@ -116,7 +116,7 @@ export const Header = () => {
         <div className="hidden lg:flex lg:flex-row lg:flex-nowrap mx-auto">
           <HeaderMenuLinks />
         </div>
-        <div className="mr-4">
+        <div className="w-1/6 text-right">
           <RainbowKitCustomConnectButton />
         </div>
       </div>
