@@ -103,7 +103,7 @@ export const Header = () => {
             </ul>
           )}
         </div>
-        <Link href="/" passHref className="flex items-center shrink-0 w-1/6">
+        <Link href="/" passHref className="hidden md:flex md:items-center md:shrink-0 md:w-1/6">
           <div className="flex relative w-[8rem] h-[2rem] sm:w-[10rem] sm:h-[2.5rem] md:w-[12rem] md:h-[3rem] lg:w-[12rem] lg:h-[4rem]">
             <Image
               alt="Salam logo"
@@ -116,7 +116,7 @@ export const Header = () => {
         <div className="hidden lg:flex lg:flex-row lg:flex-nowrap mx-auto">
           <HeaderMenuLinks />
         </div>
-        <div className="w-1/6 text-right">
+        <div className="md:w-1/6 text-right">
           <div>
             <RainbowKitCustomConnectButton />
           </div>

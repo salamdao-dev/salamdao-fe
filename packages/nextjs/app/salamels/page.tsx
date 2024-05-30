@@ -27,9 +27,9 @@ const Salamels = () => {
         <img
           src="/nft/Salamel-Overlay-Mint-page.gif"
           alt="Salamel"
-          className="w-[50%] max-w-[50rem] bottom-0 fixed max-h-[95%]"
+          className="hidden md:block md:w-[50%] md:max-w-[50rem] md:bottom-0 md:fixed md:max-h-[95%]"
         />
-        <div className="my-auto w-[40%] ml-auto mr-[10%]">
+        <div className="my-auto w-full md:w-[40%] mx-4 md:ml-auto md:mr-[10%]">
           <div className="bg-[#cebdba] max-w-[35rem] p-2 border border-black h-fit">
             <div className="flex flex-row w-full">
               <div
