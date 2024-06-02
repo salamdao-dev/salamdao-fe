@@ -1,17 +1,26 @@
 import { fallbackRPCs, karak, mainRPCs } from "./chainData";
+import { connectorsForWallets } from "@rainbow-me/rainbowkit";
+import {
+  coinbaseWallet,
+  metaMaskWallet,
+  rabbyWallet,
+  rainbowWallet,
+  safeWallet,
+  walletConnectWallet,
+} from "@rainbow-me/rainbowkit/wallets";
 import { arbitrum, mainnet } from "viem/chains";
 import { createConfig, fallback, http } from "wagmi";
-import { coinbaseWallet, injected, safe, walletConnect } from "wagmi/connectors";
 import scaffoldConfig from "~~/scaffold.config";
 
-const wagmiConnectors = [
-  injected(),
-  walletConnect({
-    projectId: scaffoldConfig.walletConnectProjectId,
-  }),
-  safe(),
-  coinbaseWallet(),
-];
+const walletList = [metaMaskWallet, rainbowWallet, rabbyWallet, walletConnectWallet, safeWallet, coinbaseWallet];
+
+const connectors = connectorsForWallets([{ groupName: "wallets", wallets: walletList }], {
+  appName: "Salam DAO",
+  appDescription: "Restake with SalamDAO to maximize your returns on Karak",
+  appIcon: "/Salam_Logomark_Black.svg",
+  appUrl: "",
+  projectId: scaffoldConfig.walletConnectProjectId,
+});
 
 export const transports = {
   [mainnet.id]: fallback([http(mainRPCs[mainnet.id]), http(fallbackRPCs[mainnet.id])]),
@@ -22,5 +31,5 @@ export const transports = {
 export const wagmiConfig = createConfig({
   chains: [mainnet, arbitrum, karak],
   transports: transports,
-  connectors: wagmiConnectors,
+  connectors,
 });

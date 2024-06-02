@@ -23,13 +23,13 @@ export const RainbowKitCustomConnectButton = () => {
     ? getBlockExplorerAddressLink(targetNetwork, connectedAddress)
     : undefined;
 
-  const { setVaultBalances, referrals, nonce, setNonce, setReferrals, setTokenBalances } = useGlobalState(state => ({
+  const { setVaultBalances, referrals, nonce, setNonce, setReferrals, setTokenDetails } = useGlobalState(state => ({
     setVaultBalances: state.setVaultBalances,
     referrals: state.referrals,
     nonce: state.nonce,
     setNonce: state.setNonce,
     setReferrals: state.setReferrals,
-    setTokenBalances: state.setTokenBalances,
+    setTokenDetails: state.setTokenDetails,
   }));
 
   const fetchBalances = useTokenBalances(connectedAddress as `0x${string}`);
@@ -53,7 +53,7 @@ export const RainbowKitCustomConnectButton = () => {
 
   useEffect(() => {
     if (!connectedAddress) {
-      setTokenBalances([]);
+      setTokenDetails({ available: {}, balances: {} });
       setVaultBalances({});
       return;
     }
@@ -64,6 +64,7 @@ export const RainbowKitCustomConnectButton = () => {
 
       try {
         const response = await axios.post(url, data);
+        console.log("response in start register wallet:", response.data);
         return response.data;
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
@@ -75,6 +76,7 @@ export const RainbowKitCustomConnectButton = () => {
     };
 
     checkReferrals().then(data => {
+      console.log("data in check referrals:", data);
       if (data.error) {
         startRegisterWallet().then(data => {
           if (data.error) {
@@ -91,19 +93,19 @@ export const RainbowKitCustomConnectButton = () => {
         setReferrals(data[0].result.data);
       }
     });
-  }, [connectedAddress, checkReferrals, setNonce, setReferrals, setTokenBalances, setVaultBalances]);
+  }, [connectedAddress, checkReferrals, setNonce, setReferrals, setTokenDetails, setVaultBalances]);
 
   useEffect(() => {
     if (!connectedAddress) {
-      setTokenBalances([]);
+      setTokenDetails({ allowances: {}, balances: {} }); // Clear balances
       return;
     }
 
     const updateBalances = async () => {
-      const balances = await fetchBalances();
-      console.log(balances);
+      console.log("Updating balances");
+      const { balances, allowances }: Record<any, any> = await fetchBalances();
       const vaultBalances = await fetchVaultBalances();
-      setTokenBalances(balances);
+      setTokenDetails({ allowances: allowances, balances: balances });
       setVaultBalances(vaultBalances);
     };
 
@@ -112,7 +114,7 @@ export const RainbowKitCustomConnectButton = () => {
     // const intervalId = setInterval(updateBalances, 60000); // Refresh once a minute
 
     // return () => clearInterval(intervalId);
-  }, [connectedAddress, fetchBalances, fetchVaultBalances, setTokenBalances, setVaultBalances]);
+  }, [connectedAddress, fetchBalances, fetchVaultBalances, setTokenDetails, setVaultBalances]);
 
   useEffect(() => {
     if (!signMessageData) return;
@@ -150,7 +152,7 @@ export const RainbowKitCustomConnectButton = () => {
     <ConnectButton.Custom>
       {({ account, chain, openConnectModal, mounted }) => {
         const connected = mounted && account && chain;
-
+        console.log("connected:", connected, "referrals:", referrals, "chain:", chain, "targetNetwork:", targetNetwork);
         return (
           <>
             {!connected ? (

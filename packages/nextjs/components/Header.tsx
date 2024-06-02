@@ -16,6 +16,10 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
+    label: "NFT",
+    href: "/salamels",
+  },
+  {
     label: "stake",
     href: "/",
   },
@@ -27,10 +31,6 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "dashboard",
     href: "/dashboard",
   },
-  {
-    label: "salamels",
-    href: "/salamels",
-  },
 ];
 
 export const HeaderMenuLinks = () => {
@@ -38,7 +38,7 @@ export const HeaderMenuLinks = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-row w-full items-center space-x-4">
+    <div className="flex flex-row w-full items-center space-x-8">
       {menuLinks.map(({ label, href }) => {
         const isActive = pathname === href;
         return (
@@ -80,7 +80,7 @@ export const Header = () => {
 
   return (
     <div className="w-full relative lg:static top-0 navbar min-h-0 justify-between z-21 px-4 sm:px-6 lg:px-8">
-      <div className="flex w-full items-center justify-between mx-auto">
+      <div className="flex w-full items-center justify-between mx-auto z-[10000]">
         <div className="lg:hidden" ref={burgerMenuRef}>
           <label
             tabIndex={0}

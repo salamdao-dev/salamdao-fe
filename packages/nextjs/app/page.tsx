@@ -1,22 +1,58 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import StakingBox from "../components/StakingBox";
+import { switchChain } from "@wagmi/core";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
+import toast from "react-hot-toast";
+import { useAccount, useWriteContract } from "wagmi";
+import ERC20Abi from "~~/contracts/abis/ERC20.json";
+import externalContracts from "~~/contracts/externalContracts";
 import { useGlobalState } from "~~/services/store/store";
+import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 const Home: NextPage = () => {
-  const { selectedAsset, canStake, stakeAmount } = useGlobalState(state => ({
-    selectedAsset: state.selectedAsset,
-    canStake: state.canStake,
-    stakeAmount: state.stakeAmount,
-  }));
-  const { address: connectedAddress } = useAccount();
+  const { selectedAsset, selectedNetwork, canStake, stakeAmount, tokenDetails, setStakeAmount } = useGlobalState(
+    state => ({
+      selectedAsset: state.selectedAsset,
+      selectedNetwork: state.selectedNetwork,
+      canStake: state.canStake,
+      stakeAmount: state.stakeAmount,
+      tokenDetails: state.tokenDetails,
+      setStakeAmount: state.setStakeAmount,
+    }),
+  );
+  const { address: connectedAddress, chainId } = useAccount();
+
+  const { writeContract, data, isError, isPending, isSuccess } = useWriteContract();
+  const {
+    writeContract: stakeWrite,
+    data: stakeData,
+    isError: stakeIsError,
+    isPending: stakeIsPending,
+    isSuccess: stakeIsSuccess,
+  } = useWriteContract();
+
+  useEffect(() => {
+    console.log("tx data:", data, isError, isPending, isSuccess);
+    if (isSuccess) {
+      setStakeAmount("0");
+      toast.success("Staked successfully");
+    }
+  }, [isSuccess, isPending, data, isError]);
+
+  useEffect(() => {
+    console.log("debugging stake data:", stakeData, stakeIsError, stakeIsPending, stakeIsSuccess);
+  }, [stakeData, stakeIsError, stakeIsPending, stakeIsSuccess]);
 
   const getStakeButtonMessage = useMemo(() => {
     if (connectedAddress === undefined) return "CONNECT WALLET";
-    if (stakeAmount === "0" || stakeAmount === "") return "ENTER AMOUNT";
+    if (stakeAmount === "0" || stakeAmount === "" || parseFloat(stakeAmount) === 0) return "ENTER AMOUNT";
+    if (
+      tokenDetails?.["allowances"][selectedNetwork.id]?.[selectedAsset.address] <
+      BigInt(parseFloat(stakeAmount) * 10 ** selectedAsset.decimals)
+    )
+      return "APPROVE";
     if (canStake) return "STAKE";
     return "";
   }, [connectedAddress, stakeAmount, canStake]);
@@ -43,10 +79,11 @@ const Home: NextPage = () => {
         <div className="w-full lg:w-2/5 mb-8 lg:mb-0">
           <div className="w-full flex flex-col items-center">
             <div className={`w-full `}>
-              <StakingBox />
-              <div className="flex flex-row justify-end text-xs w-full mt-2 lg:mt-4">7 day period to unstake</div>
-              <div
-                className={`
+              <div className={`border-2 p-4 w-full border-black bg-[#cebdba]`}>
+                <StakingBox />
+                <div className="flex flex-row justify-end text-xs w-full mt-2 lg:mt-4">7 day period to unstake</div>
+                <div
+                  className={`
                   w-full mt-4 py-2 text-center transition duration-300 
                   ${
                     canStake
@@ -54,15 +91,41 @@ const Home: NextPage = () => {
                       : "bg-[#8e8b87] cursor-not-allowed text-black/[.8]"
                   }
                 `}
-                onClick={() => {
-                  if (canStake) {
-                    const scaledNumber = BigInt(parseFloat(stakeAmount) * 10 ** selectedAsset.decimals);
-                    console.log("stakeAmount", stakeAmount);
-                    console.log("scaledNumber", scaledNumber);
-                  }
-                }}
-              >
-                {getStakeButtonMessage}
+                  onClick={async () => {
+                    if (canStake) {
+                      const scaledNumber = BigInt(parseFloat(stakeAmount) * 10 ** selectedAsset.decimals);
+                      const supervisor =
+                        externalContracts[selectedNetwork.id as keyof typeof externalContracts].VaultSupervisor.address;
+                      const abi =
+                        externalContracts[selectedNetwork.id as keyof typeof externalContracts].VaultSupervisor.abi;
+                      if (selectedNetwork.id !== chainId) {
+                        await switchChain(wagmiConfig, {
+                          chainId: selectedNetwork.id as keyof typeof externalContracts,
+                        });
+                      }
+                      const allowance = tokenDetails?.["allowances"][selectedNetwork.id]?.[selectedAsset.address];
+
+                      if (allowance < scaledNumber) {
+                        console.log("writing allowance update");
+                        writeContract({
+                          address: selectedAsset.address,
+                          functionName: "approve",
+                          abi: ERC20Abi,
+                          args: [supervisor, scaledNumber],
+                        });
+                      }
+                      console.log("depositing: ", supervisor, selectedAsset.vault, scaledNumber, allowance);
+                      stakeWrite({
+                        address: supervisor,
+                        functionName: "deposit",
+                        abi: abi,
+                        args: [selectedAsset.vault, scaledNumber],
+                      });
+                    }
+                  }}
+                >
+                  {isPending && !!data ? "STAKING ..." : getStakeButtonMessage}
+                </div>
               </div>
             </div>
           </div>

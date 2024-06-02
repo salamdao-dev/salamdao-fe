@@ -14,12 +14,12 @@ interface DashboardData {
 }
 
 export const useReduceDashboardData = () => {
-  const { tokenBalances, vaultBalances } = useGlobalState();
+  const { tokenDetails, vaultBalances } = useGlobalState();
   const [dashboardData, setDashboardData] = useState<Record<`0x${string}`, DashboardData> | undefined>(undefined);
 
   useEffect(() => {
     const data: Record<`0x${string}`, DashboardData> = {};
-    if (!vaultBalances && !tokenBalances) return;
+    if (!vaultBalances && !tokenDetails) return;
     for (const chain of Object.keys(vaultBalances ?? {})) {
       if (!isNaN(chain as unknown as number)) {
         const chainId = parseInt(chain, 10);
@@ -41,10 +41,10 @@ export const useReduceDashboardData = () => {
             }
           }
         }
-        for (const asset in tokenBalances[chainId]) {
+        for (const asset in tokenDetails.balances[chainId]) {
           if (asset === zeroAddress) continue;
           const addressString: `0x${string}` = asset as `0x${string}`;
-          const tokenBalance = tokenBalances[chainId][addressString];
+          const tokenBalance = tokenDetails.balances[chainId][addressString];
           data[addressString] = {
             ...data[addressString],
             assetName: assetMap[addressString].name,
@@ -57,7 +57,7 @@ export const useReduceDashboardData = () => {
       }
     }
     setDashboardData(data);
-  }, [tokenBalances, vaultBalances]);
+  }, [tokenDetails, vaultBalances]);
 
   return dashboardData;
 };

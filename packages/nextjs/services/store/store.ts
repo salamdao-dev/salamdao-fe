@@ -24,8 +24,8 @@ type GlobalState = {
   setNativeCurrencyPrice: (newNativeCurrencyPriceState: number) => void;
   targetNetwork: ChainWithAttributes;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
-  tokenBalances: Record<number, Record<`0x${string}`, bigint>>;
-  setTokenBalances: (newTokenBalancesState: Record<number, Record<`0x${string}`, bigint>>) => void;
+  tokenDetails: Record<string, Record<number, Record<`0x${string}`, bigint>>>;
+  setTokenDetails: (newTokenBalancesState: Record<string, Record<number, Record<`0x${string}`, bigint>>>) => void;
   canStake: boolean;
   setCanStake: (newCanStakeState: boolean) => void;
   selectedAsset: Asset;
@@ -47,8 +47,8 @@ export const useGlobalState = create<GlobalState>(set => ({
   setNativeCurrencyPrice: (newValue: number): void => set(() => ({ nativeCurrencyPrice: newValue })),
   targetNetwork: scaffoldConfig.targetNetworks[0],
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
-  tokenBalances: {},
-  setTokenBalances: (newTokenBalances: any) => set(() => ({ tokenBalances: newTokenBalances })),
+  tokenDetails: {},
+  setTokenDetails: (newTokenDetails: any) => set(() => ({ tokenDetails: newTokenDetails })),
   canStake: false,
   setCanStake: (newCanStake: boolean) => set(() => ({ canStake: newCanStake })),
   selectedAsset: assetList[0],

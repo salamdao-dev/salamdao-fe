@@ -14,10 +14,10 @@ const DashboardTable = ({ dashboardData }: { dashboardData: Record<string, any> 
 
   return (
     <div className="relative mx-4 md:mx-12">
-      <div className="mt-[3rem] xl:mt-[10rem] border border-black overflow-hidden">
+      <div className="mt-[3rem] xl:mt-[10rem] border border-black border-2 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-[#cebdba] sticky top-0">
+            <thead className="bg-[#cebdba] sticky top-0 border-b-2 border-black">
               <tr>
                 <th scope="col" className="py-3 px-4 md:px-6 w-2/5">
                   Asset
@@ -43,14 +43,14 @@ const DashboardTable = ({ dashboardData }: { dashboardData: Record<string, any> 
                   const isDisabled = item.staked === 0 && item.available === 0;
                   return (
                     <tr key={index} className="bg-[#cebdba] border-b border-black">
-                      <td className={`py-4 px-4 md:px-6 ${isDisabled ? "opacity-50" : ""}`}>{item.symbol}</td>
-                      <td className={`py-4 px-4 md:px-6 text-center ${isDisabled ? "opacity-50" : ""}`}>
+                      <td className={`w-2/5 py-4 px-4 md:px-6 ${isDisabled ? "opacity-50" : ""}`}>{item.symbol}</td>
+                      <td className={`w-1/5 py-4 px-4 md:px-6 text-center ${isDisabled ? "opacity-50" : ""}`}>
                         {item.staked}
                       </td>
-                      <td className={`py-4 px-4 md:px-6 text-center ${isDisabled ? "opacity-50" : ""}`}>
+                      <td className={`w-1/5 py-4 px-4 md:px-6 text-center ${isDisabled ? "opacity-50" : ""}`}>
                         {networkMap[item.network]}
                       </td>
-                      <td className={`py-4 px-4 md:px-6 text-end ${isDisabled ? "opacity-50" : ""}`}>
+                      <td className={`w-1/5 py-4 px-4 md:px-6 text-end ${isDisabled ? "opacity-50" : ""}`}>
                         {item.available}
                       </td>
                     </tr>
