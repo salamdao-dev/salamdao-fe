@@ -22,6 +22,7 @@ const AssetDropdown = ({ selectedAsset, setSelectedAsset, assetList, disableDrop
 
   const handleAssetChange = (asset: Asset) => {
     setSelectedAsset(asset);
+    localStorage.setItem("selectedAsset", asset.address);
     setIsOpen(false);
   };
 
@@ -37,6 +38,14 @@ const AssetDropdown = ({ selectedAsset, setSelectedAsset, assetList, disableDrop
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+    const lastSelectedAsset = localStorage.getItem("selectedAsset");
+    if (lastSelectedAsset) {
+      const asset = assetList.find(asset => asset.address === lastSelectedAsset);
+      if (asset) setSelectedAsset(asset);
+    }
+  }, [assetList]);
 
   return (
     <div className="relative flex space-between border-e-1 border-black" ref={dropdownRef}>

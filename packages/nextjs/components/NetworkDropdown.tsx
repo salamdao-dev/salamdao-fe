@@ -12,7 +12,6 @@ type NetworkDropdownProps = {
 
 const NetworkDropdown = ({ selectedNetwork, setSelectedNetwork, networkList, from }: NetworkDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  // const [selectedNetwork, setSelectedNetwork] = useState<Network | null>(networkList[0]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
 
@@ -22,6 +21,7 @@ const NetworkDropdown = ({ selectedNetwork, setSelectedNetwork, networkList, fro
 
   const handleNetworkSelect = (network: Network) => {
     setSelectedNetwork(network);
+    localStorage.setItem("selectedNetwork", network.id.toString());
     setIsOpen(false);
   };
 
@@ -33,6 +33,11 @@ const NetworkDropdown = ({ selectedNetwork, setSelectedNetwork, networkList, fro
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
+    const lastSelectedNetwork = localStorage.getItem("selectedNetwork");
+    if (lastSelectedNetwork) {
+      const network = networkList.find(network => network.id === parseInt(lastSelectedNetwork));
+      if (network) setSelectedNetwork(network);
+    }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };

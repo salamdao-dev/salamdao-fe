@@ -2,7 +2,6 @@ import { useCallback, useMemo } from "react";
 import { multicall } from "@wagmi/core";
 import { Abi } from "viem";
 import ERC20 from "~~/contracts/abis/ERC20.json";
-import externalContracts from "~~/contracts/externalContracts";
 import { mainRPCs } from "~~/services/web3/chainData";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { ContractMapping } from "~~/types/utils";
@@ -31,7 +30,7 @@ export function useTokenBalances(account: `0x${string}`) {
         address: asset.address as `0x${string}`,
         abi: ERC20 as Abi,
         functionName: "allowance",
-        args: [account, externalContracts[asset.network as keyof typeof externalContracts].VaultSupervisor.address],
+        args: [account, asset.vault],
       },
       chainId: asset.network,
     }));

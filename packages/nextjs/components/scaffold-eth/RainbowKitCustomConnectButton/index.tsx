@@ -64,7 +64,6 @@ export const RainbowKitCustomConnectButton = () => {
 
       try {
         const response = await axios.post(url, data);
-        console.log("response in start register wallet:", response.data);
         return response.data;
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
@@ -76,7 +75,6 @@ export const RainbowKitCustomConnectButton = () => {
     };
 
     checkReferrals().then(data => {
-      console.log("data in check referrals:", data);
       if (data.error) {
         startRegisterWallet().then(data => {
           if (data.error) {
@@ -102,9 +100,9 @@ export const RainbowKitCustomConnectButton = () => {
     }
 
     const updateBalances = async () => {
-      console.log("Updating balances");
       const { balances, allowances }: Record<any, any> = await fetchBalances();
       const vaultBalances = await fetchVaultBalances();
+
       setTokenDetails({ allowances: allowances, balances: balances });
       setVaultBalances(vaultBalances);
     };
@@ -152,7 +150,6 @@ export const RainbowKitCustomConnectButton = () => {
     <ConnectButton.Custom>
       {({ account, chain, openConnectModal, mounted }) => {
         const connected = mounted && account && chain;
-        console.log("connected:", connected, "referrals:", referrals, "chain:", chain, "targetNetwork:", targetNetwork);
         return (
           <>
             {!connected ? (

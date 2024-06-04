@@ -33,18 +33,11 @@ const StakingBox: React.FC = () => {
   };
 
   const getWalletBalance = (asset: `0x${string}`): string => {
-    console.log("tokenDetails:", tokenDetails);
     if (Object.keys(tokenDetails).length === 0) return "0";
     const amount = tokenDetails?.["balances"][selectedNetwork.id]?.[asset];
     if (!amount) return "0";
     return formatBigInt(amount, selectedAsset.decimals);
   };
-
-  // const getAllowance = (asset: `0x${string}`): string => {
-  //   const amount = tokenDetails?.['allowances'][selectedNetwork.id]?.[asset];
-  //   if (!amount) return "0";
-  //   return formatBigInt(amount, selectedAsset.decimals);
-  // }
 
   const handleStakeAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value === "") {
