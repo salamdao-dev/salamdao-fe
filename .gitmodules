@@ -7,3 +7,9 @@
 [submodule "packages/foundry/lib/solidity-bytes-utils"]
 	path = packages/foundry/lib/solidity-bytes-utils
 	url = https://github.com/gnsps/solidity-bytes-utils
+[submodule "packages/solidity/lib/forge-std"]
+	path = packages/solidity/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "packages/solidity/lib/creator-token-standards"]
+	path = packages/solidity/lib/creator-token-standards
+	url = https://github.com/limitbreakinc/creator-token-standards

@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS Claims;
+CREATE TABLE IF NOT EXISTS Claims (eth_address VARCHAR(42) PRIMARY KEY, price FLOAT NOT NULL, quantity INT NOT NULL);
+INSERT INTO Claims (eth_address, price, quantity) VALUES ("0x328809Bc894f92807417D2dAD6b7C998c1aFdac6", 0.025, 10);
