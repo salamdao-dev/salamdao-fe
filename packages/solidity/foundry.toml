@@ -5,4 +5,11 @@ libs = ["lib"]
 solc_version = "0.8.24"
 evm_version = "cancun"
 
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+optimizer = true
+optimizer_runs = 33_333
+
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }

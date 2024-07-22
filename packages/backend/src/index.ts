@@ -1,9 +1,10 @@
-import { PrivateKeyAccount, isAddress, parseEther, parseUnits } from "viem";
+import { PrivateKeyAccount, isAddress } from "viem";
 import { privateKeyToAccount } from 'viem/accounts'
 
 export interface Env {
 	DEV_DB: D1Database;
 	PROD_DB: D1Database;
+	CHAIN_ID: string;
 	STAGE: string;
 	PRIVATE_KEY: `0x${string}`;
 	SALAMELS_ADDRESS: `0x${string}`;
@@ -16,11 +17,11 @@ type Claim = {
 }
 
 
-const signData = async (account: PrivateKeyAccount, salamelsAddress: `0x${string}`, address: `0x${string}`, quantity: number, price: number) => {
+const signData = async (account: PrivateKeyAccount, chainId: Number, salamelsAddress: `0x${string}`, address: `0x${string}`, quantity: number, price: number) => {
 	const domain = {
 		name: 'Salamels',
 		version: '1',
-		chainId: 31337,
+		chainId: Number(chainId),
 		verifyingContract: salamelsAddress,
 	};
 
@@ -35,14 +36,14 @@ const signData = async (account: PrivateKeyAccount, salamelsAddress: `0x${string
 	const value = {
 		wallet: address,
 		quantity,
-		price: parseUnits(price.toString(), 18),
+		price
 	};
 
 	const typedData = {
-		domain: domain,
-		types: types,
-		primaryType: 'Approved' as const,
-		message: value,
+		domain,
+		types,
+		primaryType: "Approved" as const,
+		message: value
 	};
 
 	return await account.signTypedData(typedData);
@@ -86,9 +87,14 @@ export default {
 
 			console.log("salamelsAddress", salamelsAddress);
 
-			const sig = await signData(account, salamelsAddress, data.eth_address, data.quantity, data.price);
+			const sig = await signData(account, Number(env.CHAIN_ID), salamelsAddress, data.eth_address, data.quantity, data.price);
 
-			return new Response(JSON.stringify({ ...data, price: parseEther(data.price.toString()).toString(), sig }, null, 2));
+			const responseHeaders = new Headers();
+			responseHeaders.set('Access-Control-Allow-Origin', '*');
+			responseHeaders.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+			responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+			return new Response(JSON.stringify({ ...data, sig }, null, 2), { headers: responseHeaders });
 		}
 
 		return new Response(

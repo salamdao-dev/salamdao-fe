@@ -1,173 +1,228 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import StakingBox from "../components/StakingBox";
-import { switchChain } from "@wagmi/core";
-import { waitForTransactionReceipt } from "@wagmi/core";
-import type { NextPage } from "next";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { zeroAddress } from "viem";
-import { useAccount, useWriteContract } from "wagmi";
-import ERC20Abi from "~~/contracts/abis/ERC20.json";
-import externalContracts from "~~/contracts/externalContracts";
-import { useTokenBalances } from "~~/hooks/scaffold-eth/useFetchTokenBalances";
-import { useVaultBalances } from "~~/hooks/scaffold-eth/useFetchVaultStakes";
-import { useGlobalState } from "~~/services/store/store";
-import { wagmiConfig } from "~~/services/web3/wagmiConfig";
+import { Tooltip } from "react-tooltip";
+import { formatEther, getAddress } from "viem";
+import { useAccount, useBalance, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { salamels } from "~~/utils/constants";
 
-const Home: NextPage = () => {
-  const {
-    selectedAsset,
-    selectedNetwork,
-    canStake,
-    stakeAmount,
-    tokenDetails,
-    setStakeAmount,
-    setTokenDetails,
-    setVaultBalances,
-  } = useGlobalState(state => ({
-    selectedAsset: state.selectedAsset,
-    selectedNetwork: state.selectedNetwork,
-    canStake: state.canStake,
-    stakeAmount: state.stakeAmount,
-    tokenDetails: state.tokenDetails,
-    setStakeAmount: state.setStakeAmount,
-    setTokenDetails: state.setTokenDetails,
-    setVaultBalances: state.setVaultBalances,
-  }));
-  const { address: connectedAddress, chainId } = useAccount();
-  const fetchBalances = useTokenBalances(connectedAddress as `0x${string}`);
-  const fetchVaultBalances = useVaultBalances((connectedAddress as `0x${string}`) ?? zeroAddress);
+type Claim = {
+  price: bigint;
+  quantity: number;
+  sig: string;
+};
 
-  const { writeContract, data, isError, isPending, isSuccess } = useWriteContract();
+const Salamels = () => {
+  const [count, setCount] = useState<string>("0");
+  const [claimData, setClaimData] = useState<Claim>({
+    price: BigInt(0),
+    quantity: 0,
+    sig: "",
+  });
 
-  const {
-    writeContract: stakeWrite,
-    data: stakeData,
-    isError: stakeIsError,
-    isPending: stakeIsPending,
-    isSuccess: stakeIsSuccess,
-  } = useWriteContract();
+  const { chain, address } = useAccount();
+  const balance = useBalance({ address: address });
 
-  useEffect(() => {
-    const waitForApproval = async () => {
-      if (data && isSuccess) {
-        const response = await waitForTransactionReceipt(wagmiConfig, { hash: data });
-        if (response.status === "success") {
-          toast.success("Approval successful!");
-          const { allowances }: Record<any, any> = await fetchBalances();
-          setTokenDetails({ ...tokenDetails, allowances });
-        } else {
-          toast.error("Approval failed");
-        }
-      }
-    };
-    waitForApproval();
-  }, [isSuccess, isPending, data, isError]);
+  const { data: nextTokenId } = useReadContract({
+    abi: chain && salamels[chain?.id as number].abi,
+    address: chain && salamels[chain?.id as number].address,
+    functionName: "getNextTokenId",
+  });
+
+  const basePrice = BigInt("40000000000000000");
+
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === "0") {
+      setCount("1");
+    } else if (value === "") {
+      setCount("");
+    } else if (isNaN(parseInt(value))) {
+      return;
+    } else if (claimData.quantity === 0) {
+      setCount(value);
+    } else if (parseInt(value) >= claimData.quantity) {
+      setCount(claimData.quantity.toString());
+    } else if (value.match(/^[0-9]*$/) && parseInt(value) <= claimData.quantity) {
+      setCount(value);
+    }
+  };
 
   useEffect(() => {
-    const waitForStake = async () => {
-      if (stakeData && stakeIsSuccess) {
-        const response = await waitForTransactionReceipt(wagmiConfig, { hash: stakeData });
-        if (response.status === "success") {
-          setStakeAmount("0");
-          const { balances, allowances }: Record<any, any> = await fetchBalances();
-          const vaultBalances = await fetchVaultBalances();
-          setTokenDetails({ balances, allowances });
-          setVaultBalances(vaultBalances);
-          toast.success("Stake successful!");
-        } else {
-          toast.error("Stake failed");
-        }
-      }
+    if (!address) return;
+    const fetchClaims = async () => {
+      const response = await fetch(`https://salamdao.vip/api/claims?address=${getAddress(address)}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      const { price, quantity, sig } = data as Claim;
+
+      console.log("price", price, "quantity", quantity, "sig", sig);
+
+      setClaimData({
+        price: BigInt(price),
+        quantity,
+        sig,
+      });
     };
-    waitForStake();
-  }, [stakeData, stakeIsError, stakeIsPending, stakeIsSuccess]);
 
-  const getStakeButtonMessage = useMemo(() => {
-    if (connectedAddress === undefined) return "CONNECT WALLET";
-    if (stakeAmount === "0" || stakeAmount === "" || parseFloat(stakeAmount) === 0) return "ENTER AMOUNT";
-    if (
-      tokenDetails?.["allowances"][selectedNetwork.id]?.[selectedAsset.address] <
-      BigInt(parseFloat(stakeAmount) * 10 ** selectedAsset.decimals)
-    )
-      return "APPROVE";
-    if (canStake) return "STAKE";
-    return "";
-  }, [connectedAddress, stakeAmount, canStake, selectedAsset, tokenDetails]);
+    fetchClaims();
+  }, [address]);
 
-  const { symbol, description, link } = selectedAsset;
+  const mintData = {
+    abi: chain && salamels[chain?.id as number].abi,
+    address: chain && salamels[chain?.id as number].address,
+    functionName: "claimSignedMint",
+    args: [claimData.sig, Number(count), claimData.quantity, claimData.price],
+    value: claimData.price * BigInt(count),
+  };
+
+  const publicMintData = {
+    abi: chain && salamels[chain?.id as number].abi,
+    address: chain && salamels[chain?.id as number].address,
+    functionName: "publicMint",
+    args: [Number(count)],
+    value: basePrice * BigInt(count),
+  };
+
+  const { data: hash, isPending, writeContract } = useWriteContract();
+
+  const { isLoading, isSuccess, isError } = useWaitForTransactionReceipt({ hash });
+
+  const isMintTxLoading = isPending || isLoading;
+
+  const handleMint = async () => {
+    if (!hasSufficientBalance()) {
+      toast.error("Insufficient balance");
+      return;
+    }
+    if (count === "0") {
+      toast.error("Please select a quantity");
+      return;
+    }
+    if (claimData.quantity > 0) {
+      // @ts-ignore
+      writeContract(mintData);
+    } else {
+      // @ts-ignore
+      writeContract(publicMintData);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Minted successfully!");
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (isLoading) {
+      toast(() => (
+        <div>
+          <div>Minting...</div>
+          <a className="color-[#ff6a48] underline" href={`https://etherscan.io/tx/${hash}`} target="_blank">
+            View Transaction
+          </a>
+        </div>
+      ));
+    }
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (isError) {
+      toast.error("Mint failed");
+    }
+  }, [isError]);
+
+  const hasSufficientBalance = () => {
+    return balance.data && balance.data.value >= claimData.price * BigInt(count);
+  };
 
   return (
     <>
-      <div className="background-combo" />
-      <div className="flex flex-col-reverse lg:flex-row mx-4 md:mx-12 lg:mx-24 mt-12 lg:mt-[6rem]">
-        <div className="w-full lg:w-3/5 lg:pr-[12rem]">
-          <div className="italic font-bold text-2xl text-[#ff6a48] pb-8">WHY STAKING?</div>
-          <div>
-            Earn Karak XP and potentially ETH staking rewards + Restaking Rewards + Eigenlayer Points + LRT Points
-          </div>
-          <div className="italic font-bold text-2xl text-[#ff6a48] pt-8 pb-8">{symbol}</div>
-          <div>{description}</div>
-          {link && (
-            <a href={link} className="mt-12 relative underline pb-[3rem] lg:pb-0" target="_blank" rel="noreferrer">
-              Find Out More On Coingecko
-            </a>
-          )}
-        </div>
-        <div className="w-full lg:w-2/5 mb-8 lg:mb-0">
-          <div className="w-full flex flex-col items-center">
-            <div className={`w-full `}>
-              <div className={`border-2 p-4 w-full border-black bg-[#cebdba]`}>
-                <StakingBox />
-                <div className="flex flex-row justify-end text-xs w-full mt-2 lg:mt-4">7 day period to unstake</div>
+      <div className="salamels-bg" />
+      <div className="flex flex-row w-full mr-4 h-[80vh]">
+        <img
+          src="/nft/Salamel-Overlay-Mint-page.gif"
+          alt="Salamel"
+          className="hidden md:block md:w-[50%] md:max-w-[50rem] md:bottom-0 md:fixed md:max-h-[95%]"
+        />
+        <div className="my-auto w-full md:w-[40%] mx-4 md:ml-auto md:mr-[10%]">
+          <div className="p-4 bg-[#cebdba] border border-2 border-black max-w-[35rem]">
+            <div className="max-w-[35rem] p-2 h-fit">
+              <div className="flex flex-row w-full">
                 <div
-                  className={`
-                  w-full mt-4 py-2 text-center transition duration-300 
-                  ${
-                    canStake
-                      ? "bg-[#ff6a48] hover:bg-[#ff6a48]/[0.7] cursor-pointer"
-                      : "bg-[#8e8b87] cursor-not-allowed text-black/[.8]"
-                  }
-                `}
-                  onClick={async () => {
-                    if (canStake) {
-                      const scaledNumber = BigInt(parseFloat(stakeAmount) * 10 ** selectedAsset.decimals);
-                      const supervisor =
-                        externalContracts[selectedNetwork.id as keyof typeof externalContracts].VaultSupervisor.address;
-                      const abi =
-                        externalContracts[selectedNetwork.id as keyof typeof externalContracts].VaultSupervisor.abi;
-                      if (selectedNetwork.id !== chainId) {
-                        await switchChain(wagmiConfig, {
-                          chainId: selectedNetwork.id as keyof typeof externalContracts,
-                        });
-                      }
-                      const allowance = tokenDetails?.["allowances"][selectedNetwork.id]?.[selectedAsset.address];
-
-                      if (allowance < scaledNumber) {
-                        writeContract({
-                          address: selectedAsset.address,
-                          functionName: "approve",
-                          abi: ERC20Abi,
-                          args: [selectedAsset.vault, scaledNumber],
-                        });
-                      }
-
-                      stakeWrite({
-                        address: supervisor,
-                        functionName: "deposit",
-                        abi: abi,
-                        args: [selectedAsset.vault, scaledNumber],
-                      });
-                    }
-                  }}
+                  className="border border-black p-4 hover:cursor-pointer hover:bg-[#b1a19f] transition duration-300 select-none"
+                  onClick={() => parseInt(count) > 1 && setCount((parseInt(count) - 1).toString())}
                 >
-                  {isPending && !!data
-                    ? "APPROVING ..."
-                    : stakeIsPending && !!stakeData
-                    ? "STAKING ..."
-                    : getStakeButtonMessage}
+                  -
                 </div>
+                <div className="flex align-center justify-center w-full border border-x-0 border-black text-xl">
+                  <input
+                    className="w-full text-center bg-transparent border-0 focus:ring-0 focus:ring-offset-0 focus:outline-0"
+                    value={count}
+                    onChange={e => handleInput(e)}
+                  />
+                </div>
+                <div
+                  className="border border-black p-4 ml-auto hover:cursor-pointer hover:bg-[#b1a19f] transition duration-300 select-none"
+                  onClick={() => parseInt(count) < claimData.quantity && setCount((parseInt(count) + 1).toString())}
+                >
+                  +
+                </div>
+              </div>
+              <div className="flex flex-row w-full mt-2">
+                <div className="border border-black p-4 w-full bg-transparent flex justify-between">
+                  <div>total</div>
+                  <div>
+                    {formatEther(claimData.price > 0 ? claimData.price * BigInt(count) : basePrice * BigInt(count))} ETH
+                    + gas
+                  </div>
+                </div>
+              </div>
+            </div>
+            {claimData.price > 0 && claimData.price < basePrice && (
+              <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
+                You are eligible for a{" "}
+                {parseFloat(Number((basePrice - claimData.price) / claimData.price).toFixed(2)).toString()}% discount
+                <svg
+                  data-tooltip-id="info-tooltip"
+                  data-tooltip-place="top-start"
+                  data-tooltip-html={`<div className='max-w-[90vw] sm:break-words'>You are eligible for a discount based on your activity on Karak.<br /> The more you have participated in the community, the higher the discount.</div>`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4 mr-0 my-auto ml-1 hover:opacity-70 transition duration-300 hover:cursor-pointer"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                  />
+                </svg>
+                <Tooltip className="!w-[20rem] md:!w-fit break-words" id="info-tooltip" />
+              </div>
+            )}
+            <div
+              onClick={handleMint}
+              className={`bg-red-500 max-w-[35rem] py-2 text-center hover:cursor-pointer hover:bg-red-400 transition duration-300 select-none ${
+                (!hasSufficientBalance() || isMintTxLoading || count == "0") &&
+                "opacity-50 !cursor-default pointer-events-none"
+              }`}
+            >
+              {!hasSufficientBalance() ? "INSUFFICIENT BALANCE" : isMintTxLoading ? "MINTING..." : "MINT"}
+            </div>
+            <div className="max-w-[35rem] text-xl">
+              <div className="max-w-[15rem] flex flex-row justify-between mt-6 w-full mx-auto">
+                <div>{"MINTED"}</div>
+                <div>{!isNaN(Number(nextTokenId)) ? Number(nextTokenId) - 1 : 0}/10000</div>
               </div>
             </div>
           </div>
@@ -177,4 +232,4 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+export default Salamels;

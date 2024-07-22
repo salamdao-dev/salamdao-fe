@@ -9,30 +9,30 @@ export type ScaffoldConfig = {
   walletAutoConnect: boolean;
 };
 
-const karak = {
-  id: 2410,
-  name: "Karak",
-  network: "K2",
-  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-  rpcUrls: {
-    public: {
-      http: ["https://rpc.karak.network"],
-    },
-    default: {
-      http: ["https://rpc.karak.network"],
-    },
-  },
-  contracts: {
-    multicall3: {
-      address: "0x73331e33f1552E706D56aa453ce19BCE314B4F59" as `0x${string}`,
-      blockCreated: 0,
-    },
-  },
-};
+// const karak = {
+//   id: 2410,
+//   name: "Karak",
+//   network: "K2",
+//   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+//   rpcUrls: {
+//     public: {
+//       http: ["https://rpc.karak.network"],
+//     },
+//     default: {
+//       http: ["https://rpc.karak.network"],
+//     },
+//   },
+//   contracts: {
+//     multicall3: {
+//       address: "0x73331e33f1552E706D56aa453ce19BCE314B4F59" as `0x${string}`,
+//       blockCreated: 0,
+//     },
+//   },
+// };
 
 const scaffoldConfig = {
   // The networks on which your DApp is live
-  targetNetworks: [chains.mainnet, chains.arbitrum, karak],
+  targetNetworks: [chains.mainnet, chains.sepolia],
 
   // The interval at which your front-end polls the RPC servers for new data
   // it has no effect if you only target the local network (default is 4000)

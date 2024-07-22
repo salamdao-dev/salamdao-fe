@@ -17,19 +17,11 @@ type HeaderMenuLink = {
 export const menuLinks: HeaderMenuLink[] = [
   {
     label: "NFT",
-    href: "/salamels",
-  },
-  {
-    label: "stake",
     href: "/",
   },
   {
     label: "bridge",
     href: "https://karak.network/bridge",
-  },
-  {
-    label: "dashboard",
-    href: "/dashboard",
   },
 ];
 

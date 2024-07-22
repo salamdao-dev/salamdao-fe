@@ -46,7 +46,7 @@ contract BaseTest is StdCheats, StdAssertions, StdUtils, TestBase {
         vm.deal(admin, 100 ether);
 
         changePrank(admin);
-        salamels = new Salamels{salt: salt}(royaltyReceiver, royaltyAmount, "Salamels", "SALAM", signer, 1000, 1000, 1000);
+        salamels = new Salamels{salt: salt}(admin, royaltyReceiver, royaltyAmount, "Salamels", "SALAM", signer, 1000, 10000, 1000, 0.04 ether);
         CreatorTokenTransferValidatorConfiguration config = new CreatorTokenTransferValidatorConfiguration(admin);
 
         config.setNativeValueToCheckPauseState(10 ether);

@@ -1,10 +1,29 @@
+import * as chains from "viem/chains";
+import SalamelsAbi from "~~/contracts/abis/Salamels.json";
 import { Asset, Network } from "~~/types/utils";
+
+type Contract = {
+  [chainId: number]: {
+    address: `0x${string}`;
+    abi: any;
+  };
+};
 
 export const networkList: Network[] = [
   { id: 1, name: "Ethereum", icon: "/networks/eth.svg" },
-  { id: 42161, name: "Arbitrum", icon: "/networks/arbitrum.svg" },
-  { id: 2410, name: "K2", icon: "/networks/karak.svg" },
+  { id: 11155111, name: "Sepolia", icon: "/networks/eth.svg" },
 ];
+
+export const salamels: Contract = {
+  [chains.mainnet.id]: {
+    address: "0x18d9Ff688a7cf40Ff1A7509E60eb60bE693AA77F",
+    abi: SalamelsAbi,
+  },
+  [chains.sepolia.id]: {
+    address: "0x18d9Ff688a7cf40Ff1A7509E60eb60bE693AA77F",
+    abi: SalamelsAbi,
+  },
+};
 
 export const networkMap: Record<number, string> = {};
 networkList.forEach(network => (networkMap[network.id] = network.name));

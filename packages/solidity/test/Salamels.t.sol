@@ -6,7 +6,7 @@ import "src/SignedApprovalMint.sol";
 
 contract SalamelsTest is BaseTest {
 
-    bytes testSig = abi.encodePacked(hex"195c856d8f7d69539ca3eb7bef7f2464e7403507e81506636709bfe834a3d6553c841274fb2112cff8cd0747b6b98735622e27d5ac9c9bd1ceb448d923e4087e1b");
+    bytes testSig = abi.encodePacked(hex"13bd39d147958df822729f13ccf9a9d7bd55b96b0c6a53b804f3791da3686d6d193847de80e53244b4e115477b735e7d66941c87f3bd038e990e93223b277aad1b");
 
     modifier whenCallerIsNotOwner(address msgSender) {
         vm.assume(msgSender != admin);
@@ -15,15 +15,20 @@ contract SalamelsTest is BaseTest {
         _;
     }
 
+    modifier whenCallerIsOwner() {
+        changePrank(admin);
+        _;
+    }
+
     function test_constructor() public view {
         assertEq(salamels.owner(), admin);
         assertEq(salamels.approvalSigner(), signer);
         assertEq(salamels.remainingSignedMints(), 1000);
         assertFalse(salamels.signedClaimsDecommissioned());
-        assertEq(salamels.maxSupply(), 1000);
+        assertEq(salamels.maxSupply(), 10000);
         assertEq(salamels.name(), "Salamels");
         assertEq(salamels.symbol(), "SALAM");
-        assertEq(address(salamels), 0xF4593Ed8773737E902E6015959AB186caA50cdDd);
+        assertEq(address(salamels), 0xEDCE287288302dA74ddF09545f55eD7F8A6970Ab);
         assertEq(salamels.baseTokenURI(), "");
         
         (address setRoyaltyReceiver, uint256 setRoyaltyAmount) = salamels.royaltyInfo(1, 1 ether);
@@ -35,12 +40,12 @@ contract SalamelsTest is BaseTest {
         assertFalse(salamels.autoApproveTransfersFromValidator());
     }
 
-    function test_decommissionSignedApprovals() public {
+    function test_decommissionSignedApprovals() public whenCallerIsOwner {
         salamels.decommissionSignedApprovals();
         assertTrue(salamels.signedClaimsDecommissioned());
 
         vm.expectRevert(SignedApprovalMintBase.SignedApprovalMint__SignedClaimsAreDecommissioned.selector);
-        salamels.claimSignedMint{value: 25000000000000000}(abi.encodePacked(hex"965fbe52370b6a6bd0125ae940760ddea587920fe9993d19d22e9f160f0cae280dab075071f1d5319fcb3b332384679f2150c32080f8b6069f1e52b2176d4dbd1b"), 1, 1, 25000000000000000);
+        salamels.claimSignedMint{value: 25000000000000000}(testSig, 1, 1, 25000000000000000);
     }
 
     function test_decommissionSignedApprovals_notOwner(address badActor)
@@ -52,7 +57,7 @@ contract SalamelsTest is BaseTest {
         assertFalse(salamels.signedClaimsDecommissioned());
     }
 
-    function test_setBaseURI() public {
+    function test_setBaseURI() public whenCallerIsOwner {
         salamels.setBaseURI("https://example.com/");
         assertEq(salamels.baseTokenURI(), "https://example.com/");
     }
@@ -66,7 +71,7 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.baseTokenURI(), "");
     }
 
-    function test_setSuffixURI() public {
+    function test_setSuffixURI() public whenCallerIsOwner {
         salamels.setSuffixURI(".json");
         assertEq(salamels.suffixURI(), ".json");
     }
@@ -80,7 +85,14 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.suffixURI(), "");
     }
 
-    function test_ownerMint() public {
+    function test_tokenURI() public whenCallerIsOwner {
+        salamels.setBaseURI("https://example.com/");
+        salamels.setSuffixURI(".json");
+        salamels.ownerMint(alice, 1);
+        assertEq(salamels.tokenURI(1), "https://example.com/1.json");
+    }
+
+    function test_ownerMint() public whenCallerIsOwner {
         salamels.ownerMint(alice, 1);
         assertEq(salamels.remainingOwnerMints(), 999);
         assertEq(salamels.ownerOf(1), alice);
@@ -98,7 +110,7 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.balanceOf(alice), 0);
     }
 
-    function test_renounceOwnership() public {
+    function test_renounceOwnership() public whenCallerIsOwner {
         salamels.renounceOwnership();
         assertEq(salamels.owner(), address(0));
     }
@@ -112,7 +124,7 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.owner(), admin);
     }
 
-    function test_transferOwnership() public {
+    function test_transferOwnership() public whenCallerIsOwner {
         salamels.transferOwnership(alice);
         assertEq(salamels.owner(), alice);
     }
@@ -126,7 +138,7 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.owner(), admin);
     }
 
-    function test_setSigner() public {
+    function test_setSigner() public whenCallerIsOwner {
         salamels.setSigner(alice);
         assertEq(salamels.approvalSigner(), alice);
     }
@@ -140,7 +152,7 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.approvalSigner(), signer);
     }
 
-    function test_setTransferValidator() public {
+    function test_setTransferValidator() public whenCallerIsOwner {
         salamels.setTransferValidator(address(validator));
         assertEq(salamels.getTransferValidator(), address(validator));
     }
@@ -154,7 +166,7 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.getTransferValidator(), salamels.DEFAULT_TRANSFER_VALIDATOR());
     }
 
-    function test_setAutomaticApprovalOfTransfersFromValidator() public {
+    function test_setAutomaticApprovalOfTransfersFromValidator() public whenCallerIsOwner {
         assertFalse(salamels.autoApproveTransfersFromValidator());
         salamels.setAutomaticApprovalOfTransfersFromValidator(true);
         assertTrue(salamels.autoApproveTransfersFromValidator());
@@ -169,7 +181,7 @@ contract SalamelsTest is BaseTest {
         assertFalse(salamels.autoApproveTransfersFromValidator());
     }
 
-    function test_setTokenRoyalty() public {
+    function test_setTokenRoyalty() public whenCallerIsOwner {
         salamels.setTokenRoyalty(1, alice, 5_000);
         salamels.setTokenRoyalty(2, bob, 10_000);
         
@@ -192,8 +204,8 @@ contract SalamelsTest is BaseTest {
         assertEq(setRoyaltyReceiver, royaltyReceiver);
         assertEq(setRoyaltyAmount, 0.1 ether);
     }
-    
-    function test_setDefaultRoyalty() public {
+
+    function test_setDefaultRoyalty() public whenCallerIsOwner {
         (address setRoyaltyReceiver, uint256 setRoyaltyAmount) = salamels.royaltyInfo(1, 1 ether);
         assertEq(setRoyaltyReceiver, royaltyReceiver);
         assertEq(setRoyaltyAmount, 0.1 ether);
@@ -279,7 +291,7 @@ contract SalamelsTest is BaseTest {
     }
 
     function test_SignedMint_whenIncorrectAmount(uint256 quantityToMint) public {
-        quantityToMint = bound(quantityToMint, 11, 100_000);    
+        quantityToMint = bound(quantityToMint, 11, 10_000);    
         uint256 price = 25000000000000000;
         uint256 maxAmount = 10;
 
@@ -301,4 +313,15 @@ contract SalamelsTest is BaseTest {
         salamels.claimSignedMint{value: price * quantityToMint}(testSig, quantityToMint, maxAmount, price);
     }
 
+    function test_SignedMint_whenExceedsMaxSupply(uint256 amount) public {
+        amount = bound(amount, salamels.maxSupply() + 1, salamels.maxSupply() + 10_000);
+
+        uint256 price = 25000000000000000;
+        uint256 maxAmount = 10;
+
+        changePrank(alice);
+        vm.deal(alice, price * amount);
+        vm.expectRevert(MaxSupplyBase.MaxSupplyBase__MaxSupplyExceeded.selector);
+        salamels.claimSignedMint{value: price * amount}(testSig, amount, maxAmount, price);
+    }
 }

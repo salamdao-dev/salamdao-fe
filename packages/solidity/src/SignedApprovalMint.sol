@@ -41,7 +41,7 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
     event SignedClaimsDecommissioned();
 
     /// @dev Emitted when a signed mint is claimed
-    event SignedMintClaimed(address indexed minter, uint256 startTokenId, uint256 endTokenId);
+    event SignedMintClaimed(address indexed minter, uint256 startTokenId, uint256 endTokenId, uint256 price);
 
     /// @dev Emitted when a signer is updated
     event SignerUpdated(address oldSigner, address newSigner); 
@@ -53,7 +53,8 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
     /// Throws when the address has already claimed a token.
     /// Throws when the provided ETH amount does not match the expected amount (price * quantityToMint).
     function claimSignedMint(bytes calldata signature, uint256 quantityToMint, uint256 maxQuantity, uint256 price) external payable {
-        
+        _requireLessThanMaxSupply(mintedSupply() + quantityToMint);
+
         uint256 amountAlreadyMinted = addressMinted[_msgSender()];
         if (amountAlreadyMinted + quantityToMint > maxQuantity) {
             revert SignedApprovalMint__MintExceedsMaximumAmountBySignedApproval();
@@ -96,7 +97,7 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
         }
 
         (uint256 startTokenId, uint256 endTokenId) = _mintBatch(_msgSender(), quantityToMint);
-        emit SignedMintClaimed(_msgSender(), startTokenId, endTokenId);
+        emit SignedMintClaimed(_msgSender(), startTokenId, endTokenId, price);
     }
 
     /// @notice Decommissions signed approvals
