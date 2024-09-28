@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
 import { formatEther, getAddress } from "viem";
-import { useAccount, useBalance, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import {
+  useAccount,
+  useBalance,
+  usePublicClient,
+  useReadContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { salamels } from "~~/utils/constants";
 
 type Claim = {
@@ -15,6 +22,7 @@ type Claim = {
 
 const Salamels = () => {
   const [count, setCount] = useState<string>("0");
+  const [amountMinted, setAmountMinted] = useState<bigint>(BigInt(0));
   const [claimData, setClaimData] = useState<Claim>({
     price: BigInt(0),
     quantity: 0,
@@ -22,6 +30,7 @@ const Salamels = () => {
   });
 
   const { chain, address } = useAccount();
+  const client = usePublicClient();
   const balance = useBalance({ address: address });
 
   const { data: nextTokenId } = useReadContract({
@@ -42,8 +51,8 @@ const Salamels = () => {
       return;
     } else if (claimData.quantity === 0) {
       setCount(value);
-    } else if (parseInt(value) >= claimData.quantity) {
-      setCount(claimData.quantity.toString());
+    } else if (parseInt(value) >= claimData.quantity - parseInt(amountMinted.toString())) {
+      setCount((claimData.quantity - parseInt(amountMinted.toString())).toString());
     } else if (value.match(/^[0-9]*$/) && parseInt(value) <= claimData.quantity) {
       setCount(value);
     }
@@ -52,23 +61,38 @@ const Salamels = () => {
   useEffect(() => {
     if (!address) return;
     const fetchClaims = async () => {
-      const response = await fetch(`https://salamdao.vip/api/claims?address=${getAddress(address)}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
+      let price = BigInt(0);
+      let quantity = 0;
+      let sig = "";
 
-      const { price, quantity, sig } = data as Claim;
+      try {
+        const response = await fetch(`https://salamdao.vip/api/claims?address=${getAddress(address)}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
 
-      console.log("price", price, "quantity", quantity, "sig", sig);
-
+        ({ price, quantity, sig } = data as Claim);
+      } catch (error) {
+        console.error("Error fetching claimable signature from backend: ", error);
+      }
       setClaimData({
         price: BigInt(price),
         quantity,
         sig,
       });
+
+      const result = (await client?.readContract({
+        address: salamels[chain?.id as number].address,
+        abi: salamels[chain?.id as number].abi,
+        functionName: "amountMintedBySignedApproval",
+        args: [address],
+      })) as bigint;
+      if (result !== amountMinted) {
+        setAmountMinted(result);
+      }
     };
 
     fetchClaims();
@@ -191,28 +215,33 @@ const Salamels = () => {
               </div>
             </div>
             {claimData.price > 0 && claimData.price < basePrice && (
-              <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
-                You are eligible for a{" "}
-                {parseFloat(Number((basePrice - claimData.price) / claimData.price).toFixed(2)).toString()}% discount
-                <svg
-                  data-tooltip-id="info-tooltip"
-                  data-tooltip-place="top-start"
-                  data-tooltip-html={`<div className='max-w-[90vw] sm:break-words'>You are eligible for a discount based on your activity on Karak.<br /> The more you have participated in the community, the higher the discount.</div>`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-4 h-4 mr-0 my-auto ml-1 hover:opacity-70 transition duration-300 hover:cursor-pointer"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                  />
-                </svg>
-                <Tooltip className="!w-[20rem] md:!w-fit break-words" id="info-tooltip" />
-              </div>
+              <>
+                <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
+                  You are eligible for a{" "}
+                  {parseFloat(Number((basePrice - claimData.price) / claimData.price).toFixed(2)).toString()}% discount
+                  <svg
+                    data-tooltip-id="info-tooltip"
+                    data-tooltip-place="top-start"
+                    data-tooltip-html={`<div className='max-w-[90vw] sm:break-words'>You are eligible for a discount based on your activity on Karak.<br /> The more you have participated in the community, the higher the discount.</div>`}
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4 mr-0 my-auto ml-1 hover:opacity-70 transition duration-300 hover:cursor-pointer"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
+                    />
+                  </svg>
+                  <Tooltip className="!w-[20rem] md:!w-fit break-words" id="info-tooltip" />
+                </div>
+                <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
+                  You have minted {amountMinted.toString()} of {claimData.quantity} Salamels available at a discount.
+                </div>
+              </>
             )}
             <div
               onClick={handleMint}
