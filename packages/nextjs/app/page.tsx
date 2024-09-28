@@ -12,6 +12,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
+import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { salamels } from "~~/utils/constants";
 
 type Claim = {
@@ -30,7 +31,7 @@ const Salamels = () => {
   });
 
   const { chain, address } = useAccount();
-  const client = usePublicClient();
+  const client = usePublicClient({ config: wagmiConfig });
   const balance = useBalance({ address: address });
 
   const { data: nextTokenId } = useReadContract({
