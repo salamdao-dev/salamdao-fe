@@ -171,7 +171,11 @@ const Salamels = () => {
                 </div>
                 <div
                   className="border border-black p-4 ml-auto hover:cursor-pointer hover:bg-[#b1a19f] transition duration-300 select-none"
-                  onClick={() => parseInt(count) < claimData.quantity && setCount((parseInt(count) + 1).toString())}
+                  onClick={() =>
+                    claimData.quantity > 0
+                      ? parseInt(count) < claimData.quantity && setCount((parseInt(count) + 1).toString())
+                      : setCount((parseInt(count) + 1).toString())
+                  }
                 >
                   +
                 </div>
