@@ -46,11 +46,13 @@ contract BaseTest is StdCheats, StdAssertions, StdUtils, TestBase {
         vm.deal(admin, 100 ether);
 
         changePrank(admin);
-        salamels = new Salamels{salt: salt}(admin, royaltyReceiver, royaltyAmount, "Salamels", "SALAM", signer, 1000, 10000, 1000, 0.04 ether);
+        salamels = new Salamels{salt: salt}(admin, royaltyReceiver, royaltyAmount, signer, 1000, 10000, 1000, 0.04 ether);
         CreatorTokenTransferValidatorConfiguration config = new CreatorTokenTransferValidatorConfiguration(admin);
 
         config.setNativeValueToCheckPauseState(10 ether);
         validator = new CreatorTokenTransferValidator(admin, eoaRegistry, "Mock Validator", "1", address(config));
+
+        salamels.setPhase(1, 500, 500);
 
         // Warp to a more realistic timestamp
         vm.warp(1703688340);

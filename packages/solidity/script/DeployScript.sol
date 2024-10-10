@@ -13,7 +13,7 @@ contract DeploySalamels is Script {
         address deployer = 0xc2eF31f862870114253691BeEaD9eb45F993F179;
         vm.startBroadcast(privateKey);
 
-        Salamels salamels = new Salamels{salt: salt}(deployer, deployer, 1_000, "Salamels", "SALAM", deployer, 10000, 10000, 10000, 0.04 ether);
+        Salamels salamels = new Salamels{salt: salt}(deployer, deployer, 1_000, deployer, 10000, 10000, 10000, 0.04 ether);
 
         vm.stopBroadcast();
         console2.log("Salamels deployed at address: %s", address(salamels));

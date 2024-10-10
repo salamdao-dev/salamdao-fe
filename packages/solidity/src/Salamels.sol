@@ -11,31 +11,43 @@ import 'src/libraries/SalamelStrings.sol';
 
 contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, BasicRoyalties {
     using SalamelStrings for uint256;
+
     error Salamels__InvalidPaymentAmount();
+    error Salamels__PhaseMintsExceeded();
+    error Salamels__MaxMintsPerAddressPerPhaseExceeded();
+
+    uint16 private _phase;
+    bool private _enforceWalletLimit;
+
+    mapping(uint16 => uint256) private _phaseMints;
+    mapping(uint16 => uint256) private _publicMints;
+    mapping(address => mapping(uint16 => uint256)) private _addressMintsPerPhase;
 
     uint256 private immutable _basePrice;
+    uint256 private constant MAX_MINTS_PER_ADDRESS_PER_PHASE = 10;
 
     event PublicMintClaimed(address indexed minter, uint256 startTokenId, uint256 endTokenId);
+    event PhaseSet(uint16 phase, uint256 signedMints, uint256 publicMints);
+    event EnforceWalletLimitSet(bool enforceWalletLimit);
 
     constructor(
         address owner_,
         address royaltyReceiver_,
         uint96 royaltyFeeNumerator_,
-        string memory name_,
-        string memory symbol_,
         address signer_,
         uint256 maxSignedMints_,
         uint256 maxSupply_,
         uint256 maxOwnerMints_,
         uint256 basePrice_) 
-        ERC721OpenZeppelin(name_, symbol_) 
+        ERC721OpenZeppelin("Salamels", "SALAM") 
         BasicRoyalties(royaltyReceiver_, royaltyFeeNumerator_)
-        SignedApprovalMint(signer_, maxSignedMints_)
+        SignedApprovalMint(signer_)
         MaxSupply(maxSupply_, maxOwnerMints_)
-        EIP712(name_, '1') {
+        EIP712("Salamels", '1') 
+    {
         _basePrice = basePrice_;
         _transferOwnership(owner_);
-
+        _enforceWalletLimit = true;
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721C, ERC2981) returns (bool) {
@@ -52,15 +64,74 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
         _setTokenRoyalty(tokenId, receiver, feeNumerator);
     }
 
+    function setPhase(uint16 phase, uint256 signedMints, uint256 publicMints) public {
+        _requireCallerIsContractOwner();
+        _phase = phase;
+        _phaseMints[phase] = signedMints;
+        _publicMints[phase] = publicMints;
+
+        emit PhaseSet(phase, signedMints, publicMints);
+    }
+
+    function setEnforceWalletLimit(bool enforceWalletLimit) public {
+        _requireCallerIsContractOwner();
+        _enforceWalletLimit = enforceWalletLimit;
+
+        emit EnforceWalletLimitSet(enforceWalletLimit);
+    }
+
     function publicMint(uint256 quantity) public payable {
         _requireLessThanMaxSupply(mintedSupply() + quantity);
+
+        uint16 currentPhase = _phase;
+        uint256 currentPublicMints = _publicMints[currentPhase];
 
         if (msg.value != _basePrice * quantity) {
             revert Salamels__InvalidPaymentAmount();
         }
 
+        if (currentPublicMints < quantity) {
+            revert Salamels__PhaseMintsExceeded();
+        }
+
+        uint256 addressMintsAfterMint = _addressMintsPerPhase[_msgSender()][currentPhase] + quantity;
+
+        if (addressMintsAfterMint > MAX_MINTS_PER_ADDRESS_PER_PHASE && _enforceWalletLimit) {
+            revert Salamels__MaxMintsPerAddressPerPhaseExceeded();
+        }
+
+        unchecked {
+            _publicMints[currentPhase] = currentPublicMints - quantity;
+        }
+
+        _addressMintsPerPhase[_msgSender()][currentPhase] = addressMintsAfterMint;
+
         (uint256 startTokenId, uint256 endTokenId) = _mintBatch(_msgSender(), quantity);
+
         emit PublicMintClaimed(_msgSender(), startTokenId, endTokenId);
+    }
+
+    function claimSignedMint(bytes calldata signature, uint256 quantityToMint, uint256 maxQuantity, uint256 price) external payable {
+        uint16 currentPhase = _phase;
+        // Total allowable mints for the current phase
+        uint256 currentPhaseMints = _phaseMints[currentPhase];
+        // Total mints claimed by the sender for the current phase
+        uint256 addressMints = _addressMintsPerPhase[_msgSender()][currentPhase];
+
+        if (addressMints + quantityToMint > MAX_MINTS_PER_ADDRESS_PER_PHASE) {
+            revert Salamels__MaxMintsPerAddressPerPhaseExceeded();
+        }
+
+        if (currentPhaseMints < quantityToMint) {
+            revert Salamels__PhaseMintsExceeded();
+        }
+
+        unchecked {
+            _phaseMints[currentPhase] = currentPhaseMints - quantityToMint;
+            _addressMintsPerPhase[_msgSender()][currentPhase] = addressMints + quantityToMint;
+        }
+
+        _claimSignedMint(signature, quantityToMint, maxQuantity, price);
     }
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {

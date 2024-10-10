@@ -34,9 +34,6 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
     /// NOTE: This is an aggregate of all signers, updating signer will not reset or modify this amount.
     uint256 private _remainingSignedMints;
 
-    /// @dev Mapping of addresses to the amount of tokens minted by signed approval.
-    mapping(address => uint256) private addressMinted;
-
     /// @dev Emitted when signatures are decommissioned
     event SignedClaimsDecommissioned();
 
@@ -52,13 +49,13 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
     /// Throws when the quantity provided + amount already minted is greater than the maximum quantity allowed by the signer.
     /// Throws when the address has already claimed a token.
     /// Throws when the provided ETH amount does not match the expected amount (price * quantityToMint).
-    function claimSignedMint(bytes calldata signature, uint256 quantityToMint, uint256 maxQuantity, uint256 price) external payable {
+    function _claimSignedMint(
+        bytes calldata signature,
+        uint256 quantityToMint,
+        uint256 maxQuantity,
+        uint256 price
+    ) internal {
         _requireLessThanMaxSupply(mintedSupply() + quantityToMint);
-
-        uint256 amountAlreadyMinted = addressMinted[_msgSender()];
-        if (amountAlreadyMinted + quantityToMint > maxQuantity) {
-            revert SignedApprovalMint__MintExceedsMaximumAmountBySignedApproval();
-        }
 
         if (_approvalSigner == address(0)) { 
             revert SignedApprovalMint__SignerIsAddressZero();
@@ -69,11 +66,6 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
         if (msg.value != price * quantityToMint) {
             revert SignedApprovalMint__ProvidedETHAmountDoesNotMatchExpected();
         }
-
-        if (quantityToMint > _remainingSignedMints) {
-            revert SignedApprovalMint__MintExceedsMaximumAmountBySignedApproval();
-        }
-        _requireLessThanMaxSupply(mintedSupply() + quantityToMint);
 
         bytes32 hash = _hashTypedDataV4(
             keccak256(
@@ -88,12 +80,6 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
 
         if (_approvalSigner != ECDSA.recover(hash, signature)) {
             revert SignedApprovalMint__InvalidSignature();
-        }
-
-        addressMinted[_msgSender()] = amountAlreadyMinted + quantityToMint;
-
-        unchecked {
-            _remainingSignedMints -= quantityToMint;
         }
 
         (uint256 startTokenId, uint256 endTokenId) = _mintBatch(_msgSender(), quantityToMint);
@@ -129,11 +115,6 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
         _approvalSigner = newSigner;
     }
 
-    /// @notice Returns the amount already minted by signed approval
-    function amountMintedBySignedApproval(address account) public view returns (uint256) {
-        return addressMinted[account];
-    }
-
     /// @notice Returns the address of the approved signer
     function approvalSigner() public view returns (address) {
         return _approvalSigner;
@@ -156,17 +137,12 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
         }
     }
 
-    function _setSignerAndMaxSignedMintSupply(address signer_, uint256 maxSignedMints_) internal {
+    function _setSigner(address signer_) internal {
         if(signer_ == address(0)) {
             revert SignedApprovalMint__SignerCannotBeInitializedAsAddressZero();
         }
 
-        if(maxSignedMints_ == 0) {
-            revert SignedApprovalMint__MaxQuantityMustBeGreaterThanZero();
-        }
-
         _approvalSigner = signer_;
-        _remainingSignedMints = maxSignedMints_;
 
         _initializeNextTokenIdCounter();
     }
@@ -178,8 +154,8 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
  * @notice Constructable SignedApprovalMint Contract implementation.
  */
 abstract contract SignedApprovalMint is SignedApprovalMintBase, MaxSupply {
-    constructor(address signer_, uint256 maxSignedMints_) {
-        _setSignerAndMaxSignedMintSupply(signer_, maxSignedMints_);
+    constructor(address signer_) {
+        _setSigner(signer_);
     }
 
     function maxSupply() public view override(MaxSupplyBase, MaxSupply) returns (uint256) {
@@ -198,7 +174,7 @@ abstract contract SignedApprovalMintInitializable is SignedApprovalMintBase, Max
 
     bool private _signedMintSupplyInitialized;
 
-    function initializeSignerAndMaxSignedMintSupply(address signer_, uint256 maxSignedMints_) public {
+    function initializeSignerAndMaxSignedMintSupply(address signer_) public {
         _requireCallerIsContractOwner();
 
         if(_signedMintSupplyInitialized) {
@@ -207,6 +183,6 @@ abstract contract SignedApprovalMintInitializable is SignedApprovalMintBase, Max
 
         _signedMintSupplyInitialized = true;
 
-        _setSignerAndMaxSignedMintSupply(signer_, maxSignedMints_);
+        _setSigner(signer_);
     }
 }
