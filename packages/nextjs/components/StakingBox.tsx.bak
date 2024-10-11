@@ -3,10 +3,10 @@ import AssetDropdown from "./AssetDropdown";
 import NetworkDropdown from "./NetworkDropdown";
 import { useTheme } from "next-themes";
 import { useAccount } from "wagmi";
-import { useGlobalState } from "~~/services/store/store";
-import { Asset } from "~~/types/utils";
-import { assetList, networkList } from "~~/utils/constants";
-import { formatBigInt, isStrictlyNumber } from "~~/utils/utils";
+import { useGlobalState } from "../services/store/store";
+import { Asset } from "../types/utils";
+import { assetList, networkList } from "../utils/constants";
+import { formatBigInt, isStrictlyNumber } from "../utils/utils";
 
 const StakingBox: React.FC = () => {
   const { theme } = useTheme();

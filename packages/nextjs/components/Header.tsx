@@ -21,7 +21,7 @@ export const menuLinks: HeaderMenuLink[] = [
   },
   {
     label: "Gallery",
-    href: "https://karak.network/bridge",
+    href: "/gallery",
   },
 ];
 
