@@ -7,9 +7,20 @@
   background: oklch(var(--b2));
 }
 
+html,
 body {
-  background: transparent;
-  height: 100vh;
+  height: 100%;
+  overflow: hidden;
+}
+
+#__next {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+* {
+  cursor: url('../public/cursor.png'), auto !important;
 }
 
 h1,
@@ -72,10 +83,9 @@ p {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  width: 100vw;
+  right: 0;
+  bottom: 0;
   background: url("/nft/ultrawide-background.gif") no-repeat center center fixed;
   background-size: cover;
-  overflow: hidden;
   z-index: -1;
 }

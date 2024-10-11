@@ -20,7 +20,7 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
-    label: "bridge",
+    label: "Gallery",
     href: "https://karak.network/bridge",
   },
 ];
@@ -30,7 +30,7 @@ export const HeaderMenuLinks = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-row w-full items-center space-x-8">
+    <div className="flex flex-row w-full justify-center space-x-8">
       {menuLinks.map(({ label, href }) => {
         const isActive = pathname === href;
         return (
@@ -68,12 +68,25 @@ export const Header = () => {
     burgerMenuRef,
     useCallback(() => setIsDrawerOpen(false), []),
   );
-  const { theme } = useTheme();
 
   return (
-    <div className="w-full relative lg:static top-0 navbar min-h-0 justify-between z-21 px-4 sm:px-6 lg:px-8">
-      <div className="flex w-full items-center justify-between mx-auto z-[10000]">
-        <div className="lg:hidden" ref={burgerMenuRef}>
+    <div className="sticky top-0 z-20 w-full px-4 py-3 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-3 items-center mx-auto max-w-7xl">
+        <div className="flex justify-start">
+          <Link href="/" passHref>
+            <Image alt="Salam logo" width={500} height={109} src="/Salam_Logo_Color.svg" className="w-full h-auto" />
+          </Link>
+        </div>
+
+        <div className="hidden sm:flex justify-center">
+          <HeaderMenuLinks />
+        </div>
+
+        <div className="hidden sm:flex justify-end">
+          <RainbowKitCustomConnectButton />
+        </div>
+
+        <div className="sm:hidden col-start-3 justify-self-end" ref={burgerMenuRef}>
           <label
             tabIndex={0}
             className={`ml-1 btn btn-ghost ${isDrawerOpen ? "hover:bg-secondary" : "hover:bg-transparent"}`}
@@ -81,37 +94,22 @@ export const Header = () => {
               setIsDrawerOpen(prevIsOpenState => !prevIsOpenState);
             }}
           >
-            <Bars3Icon className="h-6 w-6" />
+            <Bars3Icon className="h-8 w-8" />
           </label>
           {isDrawerOpen && (
             <ul
               tabIndex={0}
-              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-fit absolute z-20"
+              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52 absolute right-0"
               onClick={() => {
                 setIsDrawerOpen(false);
               }}
             >
               <HeaderMenuLinks />
+              <li>
+                <RainbowKitCustomConnectButton />
+              </li>
             </ul>
           )}
-        </div>
-        <Link href="/" passHref className="hidden md:flex md:items-center md:shrink-0 md:w-1/6">
-          <div className="flex relative w-[8rem] h-[2rem] sm:w-[10rem] sm:h-[2.5rem] md:w-[12rem] md:h-[3rem] lg:w-[12rem] lg:h-[4rem]">
-            <Image
-              alt="Salam logo"
-              className="cursor-pointer"
-              fill
-              src={`${theme === "dark" ? "/Salam_Logo_White.svg" : "/Salam_Logotype_Black.svg"}`}
-            />
-          </div>
-        </Link>
-        <div className="hidden lg:flex lg:flex-row lg:flex-nowrap mx-auto">
-          <HeaderMenuLinks />
-        </div>
-        <div className="md:w-1/6 text-right">
-          <div>
-            <RainbowKitCustomConnectButton />
-          </div>
         </div>
       </div>
     </div>

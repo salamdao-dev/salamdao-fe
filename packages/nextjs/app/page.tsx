@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Tooltip } from "react-tooltip";
+// import { Tooltip } from "react-tooltip";
 import { formatEther, getAddress } from "viem";
 import {
   useAccount,
@@ -30,7 +30,7 @@ const Salamels = () => {
     sig: "",
   });
 
-  const { chain, address } = useAccount();
+  const { chain, address, isConnected } = useAccount();
   const client = usePublicClient({ config: wagmiConfig });
   const balance = useBalance({ address: address });
 
@@ -183,7 +183,7 @@ const Salamels = () => {
               <div className="flex flex-row w-full">
                 <div
                   className="border border-black p-4 hover:cursor-pointer hover:bg-[#b1a19f] transition duration-300 select-none"
-                  onClick={() => parseInt(count) > 1 && setCount((parseInt(count) - 1).toString())}
+                  onClick={() => parseInt(count) >= 1 && setCount((parseInt(count) - 1).toString())}
                 >
                   -
                 </div>
@@ -217,7 +217,7 @@ const Salamels = () => {
             </div>
             {claimData.price > 0 && claimData.price < basePrice && (
               <>
-                <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
+                {/* <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
                   You are eligible for a{" "}
                   {parseFloat(Number((basePrice - claimData.price) / claimData.price).toFixed(2)).toString()}% discount
                   <svg
@@ -238,9 +238,9 @@ const Salamels = () => {
                     />
                   </svg>
                   <Tooltip className="!w-[20rem] md:!w-fit break-words" id="info-tooltip" />
-                </div>
+                </div> */}
                 <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
-                  You have minted {amountMinted.toString()} of {claimData.quantity} Salamels available at a discount.
+                  You have minted {amountMinted.toString()} of {claimData.quantity} Salamels available.
                 </div>
               </>
             )}
@@ -251,7 +251,13 @@ const Salamels = () => {
                 "opacity-50 !cursor-default pointer-events-none"
               }`}
             >
-              {!hasSufficientBalance() ? "INSUFFICIENT BALANCE" : isMintTxLoading ? "MINTING..." : "MINT"}
+              {isConnected
+                ? !hasSufficientBalance()
+                  ? "INSUFFICIENT BALANCE"
+                  : isMintTxLoading
+                  ? "MINTING..."
+                  : "MINT"
+                : "CONNECT WALLET"}
             </div>
             <div className="max-w-[35rem] text-xl">
               <div className="max-w-[15rem] flex flex-row justify-between mt-6 w-full mx-auto">
