@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-// import { Tooltip } from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import { formatEther, getAddress } from "viem";
 import {
   useAccount,
@@ -12,6 +12,7 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
+import PrimaryButton from "~~/components/common/PrimaryButton";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { salamels } from "~~/utils/constants";
 
@@ -217,7 +218,7 @@ const Salamels = () => {
             </div>
             {claimData.price > 0 && claimData.price < basePrice && (
               <>
-                {/* <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
+                <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
                   You are eligible for a{" "}
                   {parseFloat(Number((basePrice - claimData.price) / claimData.price).toFixed(2)).toString()}% discount
                   <svg
@@ -238,18 +239,16 @@ const Salamels = () => {
                     />
                   </svg>
                   <Tooltip className="!w-[20rem] md:!w-fit break-words" id="info-tooltip" />
-                </div> */}
+                </div>
                 <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
                   You have minted {amountMinted.toString()} of {claimData.quantity} Salamels available.
                 </div>
               </>
             )}
-            <div
+            <PrimaryButton
+              className="max-w-[35rem] w-full ml-2 mr-1 text-sm sm:text-base md:text-lg lg:text-3xl"
+              disabled={!isConnected || !hasSufficientBalance() || isMintTxLoading || count == "0"}
               onClick={handleMint}
-              className={`bg-red-500 max-w-[35rem] py-2 text-center hover:cursor-pointer hover:bg-red-400 transition duration-300 select-none ${
-                (!hasSufficientBalance() || isMintTxLoading || count == "0") &&
-                "opacity-50 !cursor-default pointer-events-none"
-              }`}
             >
               {isConnected
                 ? !hasSufficientBalance()
@@ -258,7 +257,15 @@ const Salamels = () => {
                   ? "MINTING..."
                   : "MINT"
                 : "CONNECT WALLET"}
-            </div>
+            </PrimaryButton>
+            {/* <div
+              onClick={handleMint}
+              className={`bg-red-500 max-w-[35rem] py-2 text-center hover:cursor-pointer hover:bg-red-400 transition duration-300 select-none ${(!hasSufficientBalance() || isMintTxLoading || count == "0") &&
+                "opacity-50 !cursor-default pointer-events-none"
+                }`}
+            >
+
+            </div> */}
             <div className="max-w-[35rem] text-xl">
               <div className="max-w-[15rem] flex flex-row justify-between mt-6 w-full mx-auto">
                 <div>{"MINTED"}</div>

@@ -35,12 +35,14 @@ p {
   margin: 1rem 0;
 }
 
-.btn {
-  @apply shadow-md;
-}
+@layer components {
+  .btn {
+    @apply shadow-md;
+  }
 
-.btn.btn-ghost {
-  @apply shadow-none;
+  .btn.btn-ghost {
+    @apply shadow-none;
+  }
 }
 
 .background-combo {

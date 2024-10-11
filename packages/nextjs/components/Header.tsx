@@ -71,7 +71,7 @@ export const Header = () => {
 
   return (
     <div className="sticky top-0 z-20 w-full px-4 py-3 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-3 items-center mx-auto max-w-7xl">
+      <div className="flex flex-row sm:grid sm:grid-cols-3 items-center mx-auto max-w-7xl">
         <div className="flex justify-start">
           <Link href="/" passHref>
             <Image alt="Salam logo" width={500} height={109} src="/Salam_Logo_Color.svg" className="w-full h-auto" />

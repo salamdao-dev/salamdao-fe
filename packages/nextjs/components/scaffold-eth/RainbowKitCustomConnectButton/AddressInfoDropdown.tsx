@@ -43,7 +43,9 @@ export const AddressInfoDropdown = ({ address, blockExplorerAddressLink }: Addre
           tabIndex={0}
           className="list-none px-4 py-2 transition-all duration-300 ease-in-out text-black bg-gradient-to-b from-[#FF3217] via-[#E92E15] to-[#C92712] hover:from-[#FF3217] hover:via-[#E92E15] hover:to-[#971D0E] salamGreyBox"
         >
-          <span className="ml-2 mr-1">{checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}</span>
+          <span className="ml-2 mr-1 text-sm sm:text-base md:text-lg lg:text-3xl">
+            {checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}
+          </span>
         </summary>
         <ul tabIndex={0} className="dropdown-content menu z-[2] p-2 mt-2 bg-base-200 rounded-none gap-1">
           <NetworkOptions hidden={!selectingNetwork} />

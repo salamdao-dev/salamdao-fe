@@ -24,7 +24,9 @@ export const RainbowKitCustomConnectButton = () => {
         return (
           <>
             {!connected ? (
-              <PrimaryButton onClick={openConnectModal}>connect</PrimaryButton>
+              <PrimaryButton className="text-sm sm:text-base md:text-lg lg:text-3xl" onClick={openConnectModal}>
+                connect
+              </PrimaryButton>
             ) : chain.unsupported || chain.id !== targetNetwork.id ? (
               <WrongNetworkDropdown />
             ) : (
