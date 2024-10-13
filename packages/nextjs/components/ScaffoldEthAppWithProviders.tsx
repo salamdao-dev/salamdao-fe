@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { WagmiProvider } from "wagmi";
 import { Header } from "~~/components/Header";
+import { AudioProvider } from "~~/context/AudioContext";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
@@ -24,7 +25,9 @@ export const ScaffoldEthAppWithProviders = ({ children }: { children: React.Reac
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={lightTheme()}>
-          <ScaffoldEthApp>{children}</ScaffoldEthApp>
+          <AudioProvider>
+            <ScaffoldEthApp>{children}</ScaffoldEthApp>
+          </AudioProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

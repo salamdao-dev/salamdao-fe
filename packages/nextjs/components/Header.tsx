@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { useAudio } from "~~/context/AudioContext";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 
 type HeaderMenuLink = {
@@ -63,11 +64,35 @@ export const HeaderMenuLinks = () => {
  */
 export const Header = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { shouldPlayAudio, setShouldPlayAudio } = useAudio();
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+
   const burgerMenuRef = useRef<HTMLDivElement>(null);
+
   useOutsideClick(
     burgerMenuRef,
     useCallback(() => setIsDrawerOpen(false), []),
   );
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const audioPath = `${process.env.PUBLIC_URL || ""}/salam_soundtrack.mp3`;
+
+      const newAudio = new Audio(audioPath);
+      newAudio.loop = true;
+      setAudio(newAudio);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (shouldPlayAudio && audio) {
+      audio.play().catch(error => {
+        console.error("Failed to play audio:", error);
+      });
+    } else if (audio) {
+      audio.pause();
+    }
+  }, [shouldPlayAudio, audio]);
 
   return (
     <div className="sticky top-0 z-20 w-full px-4 py-3 sm:px-6 lg:px-8">
@@ -82,8 +107,22 @@ export const Header = () => {
           <HeaderMenuLinks />
         </div>
 
-        <div className="hidden sm:flex justify-end">
-          <RainbowKitCustomConnectButton />
+        <div className="hidden sm:flex justify-end flex-row">
+          <div onClick={() => setShouldPlayAudio(!shouldPlayAudio)}>
+            <img
+              src="/muted.svg"
+              alt="muted"
+              className={`w-auto h-full mr-4 ${!shouldPlayAudio ? "block" : "hidden"}`}
+            />
+            <img
+              src="/unmuted.svg"
+              alt="unmuted"
+              className={`w-auto h-full mr-4 ${shouldPlayAudio ? "block" : "hidden"}`}
+            />
+          </div>
+          <div className="flex items-center">
+            <RainbowKitCustomConnectButton />
+          </div>
         </div>
 
         <div className="sm:hidden col-start-3 justify-self-end" ref={burgerMenuRef}>
