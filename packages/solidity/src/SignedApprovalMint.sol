@@ -51,8 +51,6 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
         uint256 maxQuantity,
         uint256 price
     ) internal {
-        _requireLessThanMaxSupply(mintedSupply() + quantityToMint);
-
         if (_approvalSigner == address(0)) { 
             revert SignedApprovalMint__SignerIsAddressZero();
         }
