@@ -119,15 +119,15 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
         _requireLessThanMaxSupply(totalSupply + quantityToMint);
 
         uint16 currentPhase = _phase;
-        // Total allowable mints for the current phase
         uint256 currentPhaseMints = _phaseMints[currentPhase];
-        // Total mints claimed by the sender for the current phase
         uint256 addressMints = _addressMintsPerPhase[_msgSender()][currentPhase];
 
         uint256 totalAddressMints = addressMints + quantityToMint;
 
-        if (totalAddressMints > MAX_MINTS_PER_ADDRESS_PER_PHASE) {
-            revert Salamels__MaxMintsPerAddressPerPhaseExceeded();
+        if (_enforceWalletLimit) {
+            if (totalAddressMints > MAX_MINTS_PER_ADDRESS_PER_PHASE) {
+                revert Salamels__MaxMintsPerAddressPerPhaseExceeded();
+            }
         }
 
         if (totalAddressMints > maxQuantity) {
@@ -140,7 +140,7 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
 
         unchecked {
             _phaseMints[currentPhase] = currentPhaseMints - quantityToMint;
-            _addressMintsPerPhase[_msgSender()][currentPhase] = addressMints + quantityToMint;
+            _addressMintsPerPhase[_msgSender()][currentPhase] = totalAddressMints;
         }
 
         _claimSignedMint(signature, quantityToMint, maxQuantity, price);

@@ -15,6 +15,7 @@ import {
 import CallToActionButton from "~~/components/common/CallToActionButton";
 import PrimaryButton from "~~/components/common/PrimaryButton";
 import { useAudio } from "~~/context/AudioContext";
+import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { wagmiConfig } from "~~/services/web3/wagmiConfig";
 import { salamels } from "~~/utils/constants";
 
@@ -26,6 +27,7 @@ type Claim = {
 
 const Salamels = () => {
   const { setShouldPlayAudio } = useAudio();
+  const { targetNetwork } = useTargetNetwork();
 
   const [showModal, setShowModal] = useState<boolean>(true);
   const [showContent, setShowContent] = useState<boolean>(false);
@@ -183,7 +185,11 @@ const Salamels = () => {
       toast(() => (
         <div>
           <div>Minting...</div>
-          <a className="color-[#ff6a48] underline" href={`https://etherscan.io/tx/${hash}`} target="_blank">
+          <a
+            className="color-[#ff6a48] underline"
+            href={`${targetNetwork?.blockExplorers?.default.url}/tx/${hash}`}
+            target="_blank"
+          >
             View Transaction
           </a>
         </div>
