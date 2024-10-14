@@ -47,8 +47,6 @@ const Salamels = () => {
   const client = usePublicClient({ config: wagmiConfig });
   const balance = useBalance({ address: address });
 
-  console.log("balance data: ", balance.data);
-
   const { data: nextTokenId } = useReadContract({
     abi: chain && salamels[chain?.id as number].abi,
     address: chain && salamels[chain?.id as number].address,
@@ -262,9 +260,6 @@ const Salamels = () => {
   }, [isError, isMintGenerationError]);
 
   const hasSufficientBalance = () => {
-    console.log("balance data: ", balance.data);
-    console.log("claim data: ", totalPrice);
-    console.log("check: ", balance.data && balance.data.value >= totalPrice);
     return balance.data && balance.data.value >= totalPrice;
   };
 
