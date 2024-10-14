@@ -1,7 +1,7 @@
 import create from "zustand";
 import scaffoldConfig from "~~/scaffold.config";
-import { Asset, Network, ReferralData } from "~~/types/utils";
-import { assetList, networkList } from "~~/utils/constants";
+import { Network, ReferralData } from "~~/types/utils";
+import { networkList } from "~~/utils/constants";
 import { ChainWithAttributes } from "~~/utils/scaffold-eth";
 
 /**
@@ -28,8 +28,8 @@ type GlobalState = {
   setTokenDetails: (newTokenBalancesState: Record<string, Record<number, Record<`0x${string}`, bigint>>>) => void;
   canStake: boolean;
   setCanStake: (newCanStakeState: boolean) => void;
-  selectedAsset: Asset;
-  setSelectedAsset: (newSelectedAssetState: Asset) => void;
+  // selectedAsset: Asset;
+  // setSelectedAsset: (newSelectedAssetState: Asset) => void;
   stakeAmount: string;
   setStakeAmount: (newStakeAmountState: string) => void;
   vaultBalances: Record<number, Record<string, Record<string, bigint>>> | undefined;
@@ -51,8 +51,8 @@ export const useGlobalState = create<GlobalState>(set => ({
   setTokenDetails: (newTokenDetails: any) => set(() => ({ tokenDetails: newTokenDetails })),
   canStake: false,
   setCanStake: (newCanStake: boolean) => set(() => ({ canStake: newCanStake })),
-  selectedAsset: assetList[0],
-  setSelectedAsset: (newSelectedAsset: Asset) => set(() => ({ selectedAsset: newSelectedAsset })),
+  // selectedAsset: assetList[0],
+  // setSelectedAsset: (newSelectedAsset: Asset) => set(() => ({ selectedAsset: newSelectedAsset })),
   stakeAmount: "0",
   setStakeAmount: (newStakeAmount: string) => set(() => ({ stakeAmount: newStakeAmount })),
   vaultBalances: undefined,

@@ -1,5 +1,5 @@
 source .env
 
-forge script --chain sepolia script/DeployScript.sol:DeploySalamels --rpc-url $SEPOLIA_RPC_URL -vvvv --broadcast --verify
+forge script --chain-id 84532 script/DeployScript.sol:DeploySalamels --rpc-url $BASE_SEPOLIA_RPC_URL -vvvv --broadcast --verify --etherscan-api-key $ETHERSCAN_API_KEY
 
-# forge verify-contract --guess-constructor-args 0xFC6Aadf4c3800CCc4954a2f956B4aD47c5B75375 --rpc-url $SEPOLIA_RPC_URL
+# forge verify-contract --guess-constructor-args 0xA1Fa1FaDB17fA31B145ecB5B6B474F74D5Da54Be --rpc-url $BASE_SEPOLIA_RPC_URL --etherscan-api-key $ETHERSCAN_API_KEY

@@ -8,7 +8,7 @@ import {
   safeWallet,
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { mainnet, sepolia } from "viem/chains";
+import { base, baseSepolia } from "viem/chains";
 import { createConfig, fallback, http, unstable_connector } from "wagmi";
 import { injected } from "wagmi/connectors";
 import scaffoldConfig from "~~/scaffold.config";
@@ -25,12 +25,16 @@ const connectors = connectorsForWallets([{ groupName: "wallets", wallets: wallet
 });
 
 export const transports = {
-  [mainnet.id]: fallback([unstable_connector(injected), http(mainRPCs[mainnet.id]), http(fallbackRPCs[mainnet.id])]),
-  [sepolia.id]: fallback([unstable_connector(injected), http(mainRPCs[sepolia.id]), http(fallbackRPCs[sepolia.id])]),
+  [base.id]: fallback([unstable_connector(injected), http(mainRPCs[base.id]), http(fallbackRPCs[base.id])]),
+  [baseSepolia.id]: fallback([
+    unstable_connector(injected),
+    http(mainRPCs[baseSepolia.id]),
+    http(fallbackRPCs[baseSepolia.id]),
+  ]),
 };
 
 export const wagmiConfig = createConfig({
-  chains: [mainnet, sepolia],
+  chains: [base, baseSepolia],
   transports: transports,
   connectors,
 });

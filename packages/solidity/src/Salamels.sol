@@ -115,6 +115,9 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
     }
 
     function claimSignedMint(bytes calldata signature, uint256 quantityToMint, uint256 maxQuantity, uint256 price) external payable {
+        uint256 totalSupply = mintedSupply();
+        _requireLessThanMaxSupply(totalSupply + quantityToMint);
+
         uint16 currentPhase = _phase;
         // Total allowable mints for the current phase
         uint256 currentPhaseMints = _phaseMints[currentPhase];
@@ -143,6 +146,11 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
         _claimSignedMint(signature, quantityToMint, maxQuantity, price);
     }
 
+    function retrieveMintFunds() external {
+        _requireCallerIsContractOwner();
+        payable(owner()).transfer(address(this).balance);
+    }
+
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
         return bytes(baseTokenURI).length > 0
             ? string(abi.encodePacked(baseTokenURI, tokenId.toString(), suffixURI))
@@ -151,6 +159,10 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
 
     function domainSeparatorV4() external view returns (bytes32 domainSeparator) {
         domainSeparator = _domainSeparatorV4();
+    }
+
+    function getPhase() external view returns (uint16) {
+        return _phase;
     }
 
     function getPhaseMints(uint16 phase) external view returns (uint256) {

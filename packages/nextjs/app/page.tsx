@@ -32,6 +32,8 @@ const Salamels = () => {
 
   const [count, setCount] = useState<string>("0");
   const [amountMinted, setAmountMinted] = useState<bigint>(BigInt(0));
+  const [amountPublicMinted, setAmountPublicMinted] = useState<number>(0);
+  const [phase, setPhase] = useState<number>(0);
   const [claimData, setClaimData] = useState<Claim>({
     price: BigInt(0),
     quantity: 0,
@@ -94,15 +96,31 @@ const Salamels = () => {
         sig,
       });
 
+      const phase = (await client?.readContract({
+        address: salamels[chain?.id as number].address,
+        abi: salamels[chain?.id as number].abi,
+        functionName: "getPhase",
+        args: [],
+      })) as number;
+      setPhase(phase);
+
       const result = (await client?.readContract({
         address: salamels[chain?.id as number].address,
         abi: salamels[chain?.id as number].abi,
-        functionName: "amountMintedBySignedApproval",
-        args: [address],
+        functionName: "getAddressMintsPerPhase",
+        args: [address, phase],
       })) as bigint;
-      if (result !== amountMinted) {
+      if (result !== amountMinted && result) {
         setAmountMinted(result);
       }
+
+      const publicMints = (await client?.readContract({
+        address: salamels[chain?.id as number].address,
+        abi: salamels[chain?.id as number].abi,
+        functionName: "getPublicMints",
+        args: [phase],
+      })) as bigint;
+      setAmountPublicMinted(Number(publicMints));
     };
 
     fetchClaims();
@@ -320,9 +338,13 @@ const Salamels = () => {
           >
 
           </div> */}
-              <div className="max-w-[35rem] text-xl">
-                <div className="max-w-[15rem] flex flex-row justify-between mt-6 w-full mx-auto">
-                  <div>{"MINTED"}</div>
+              <div className="max-w-[35rem] ">
+                <div className="mt-6 max-w-[25rem] flex flex-row justify-between w-full mx-auto">
+                  <div>{"REMAINING PUBLIC MINTS PHASE " + phase}</div>
+                  <div>{amountPublicMinted}/500</div>
+                </div>
+                <div className="max-w-[25rem] flex flex-row justify-between w-full mx-auto">
+                  <div>{"TOTAL MINTED"}</div>
                   <div>{!isNaN(Number(nextTokenId)) ? Number(nextTokenId) - 1 : 0}/10000</div>
                 </div>
               </div>

@@ -26,7 +26,6 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.maxSupply(), 10000);
         assertEq(salamels.name(), "Salamels");
         assertEq(salamels.symbol(), "SALAM");
-        assertEq(address(salamels), 0x44AE3D01c4e7B6f8678E28e019c656e9fC382017);
         assertEq(salamels.baseTokenURI(), "");
         
         (address setRoyaltyReceiver, uint256 setRoyaltyAmount) = salamels.royaltyInfo(1, 1 ether);
@@ -320,7 +319,7 @@ contract SalamelsTest is BaseTest {
 
         changePrank(alice);
         vm.deal(alice, price * amount);
-        vm.expectRevert(Salamels.Salamels__MaxMintsPerAddressPerPhaseExceeded.selector);
+        vm.expectRevert(MaxSupplyBase.MaxSupplyBase__MaxSupplyExceeded.selector);
         salamels.claimSignedMint{value: price * amount}(testSig, amount, maxAmount, price);
     }
 }
