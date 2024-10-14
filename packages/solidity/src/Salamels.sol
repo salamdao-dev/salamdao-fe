@@ -185,6 +185,10 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
         return MAX_MINTS_PER_ADDRESS_PER_PHASE;
     }
 
+    function isMaxWalletLimitEnforced() external view returns (bool) {
+        return _enforceWalletLimit;
+    }
+
     function _mintToken(address to, uint256 tokenId) internal virtual override {
         _mint(to, tokenId);
     }

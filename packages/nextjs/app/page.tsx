@@ -33,6 +33,7 @@ const Salamels = () => {
   const [showContent, setShowContent] = useState<boolean>(false);
 
   const [count, setCount] = useState<string>("0");
+  const [totalPrice, setTotalPrice] = useState<bigint>(BigInt(0));
   const [amountMinted, setAmountMinted] = useState<bigint>(BigInt(0));
   const [amountPublicMinted, setAmountPublicMinted] = useState<number>(0);
   const [phase, setPhase] = useState<number>(0);
@@ -46,6 +47,8 @@ const Salamels = () => {
   const client = usePublicClient({ config: wagmiConfig });
   const balance = useBalance({ address: address });
 
+  console.log("balance data: ", balance.data);
+
   const { data: nextTokenId } = useReadContract({
     abi: chain && salamels[chain?.id as number].abi,
     address: chain && salamels[chain?.id as number].address,
@@ -56,19 +59,66 @@ const Salamels = () => {
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    let newCount = value;
+
     if (value === "0") {
-      setCount("1");
+      newCount = "1";
     } else if (value === "") {
-      setCount("");
+      newCount = "";
     } else if (isNaN(parseInt(value))) {
       return;
     } else if (claimData.quantity === 0) {
-      setCount(value);
+      newCount = value;
     } else if (parseInt(value) >= claimData.quantity - parseInt(amountMinted.toString())) {
-      setCount((claimData.quantity - parseInt(amountMinted.toString())).toString());
+      newCount = (claimData.quantity - parseInt(amountMinted.toString())).toString();
     } else if (value.match(/^[0-9]*$/) && parseInt(value) <= claimData.quantity) {
-      setCount(value);
+      newCount = value;
     }
+
+    setCount(newCount);
+
+    if (claimData.price > 0) {
+      setTotalPrice(claimData.price * BigInt(newCount || "0"));
+    } else {
+      setTotalPrice(basePrice * BigInt(newCount || "0"));
+    }
+  };
+
+  const handleMinusButton = () => {
+    let newCount = count;
+    if (parseInt(count) >= 1) {
+      newCount = (parseInt(count) - 1).toString();
+      setCount(newCount);
+    }
+
+    if (claimData.price > 0) {
+      setTotalPrice(claimData.price * BigInt(newCount));
+    } else {
+      setTotalPrice(basePrice * BigInt(newCount));
+    }
+  };
+
+  const handlePlusButton = () => {
+    let newCount = count;
+    if (claimData.quantity > 0) {
+      if (parseInt(count) < claimData.quantity - parseInt(amountMinted.toString())) {
+        newCount = (parseInt(count) + 1).toString();
+        setCount(newCount);
+      }
+    } else {
+      newCount = (parseInt(count) + 1).toString();
+      setCount(newCount);
+    }
+
+    if (claimData.price > 0) {
+      setTotalPrice(claimData.price * BigInt(newCount));
+    } else {
+      setTotalPrice(basePrice * BigInt(newCount));
+    }
+  };
+
+  const hasPrivateMints = () => {
+    return claimData.quantity > 0 && amountMinted < claimData.quantity;
   };
 
   useEffect(() => {
@@ -91,7 +141,7 @@ const Salamels = () => {
       } catch (error) {
         console.error("Error fetching claimable signature from backend: ", error);
       }
-      console.log("Claim data: ", price, quantity, sig);
+
       setClaimData({
         price: BigInt(price),
         quantity,
@@ -165,7 +215,7 @@ const Salamels = () => {
       toast.error("Please select a quantity");
       return;
     }
-    if (claimData.quantity > 0) {
+    if (hasPrivateMints()) {
       // @ts-ignore
       writeContract(mintData);
     } else {
@@ -212,7 +262,10 @@ const Salamels = () => {
   }, [isError, isMintGenerationError]);
 
   const hasSufficientBalance = () => {
-    return balance.data && balance.data.value >= claimData.price * BigInt(count);
+    console.log("balance data: ", balance.data);
+    console.log("claim data: ", totalPrice);
+    console.log("check: ", balance.data && balance.data.value >= totalPrice);
+    return balance.data && balance.data.value >= totalPrice;
   };
 
   const handleYes = () => {
@@ -223,6 +276,18 @@ const Salamels = () => {
 
   const handleNo = () => {
     window.location.href = "https://abudhabiculture.ae/en/experience/heritage-festivals/al-dhafra-festival";
+  };
+
+  const getMintButtonText = () => {
+    if (!isConnected) {
+      return "CONNECT WALLET";
+    } else if (!hasSufficientBalance()) {
+      return "INSUFFICIENT BALANCE";
+    } else if (isMintTxLoading) {
+      return "MINTING...";
+    } else {
+      return "MINT";
+    }
   };
 
   return (
@@ -262,7 +327,7 @@ const Salamels = () => {
                 <div className="flex flex-row w-full">
                   <div
                     className="salamGreyBox text-4xl w-[20%] text-center border border-black p-4 ml-auto mr-auto hover:cursor-pointer bg-[#cebdba] hover:bg-[#b1a19f] transition duration-300 select-none"
-                    onClick={() => parseInt(count) >= 1 && setCount((parseInt(count) - 1).toString())}
+                    onClick={handleMinusButton}
                   >
                     -
                   </div>
@@ -275,11 +340,7 @@ const Salamels = () => {
                   </div>
                   <div
                     className="salamGreyBox text-4xl w-[20%] text-center border border-black p-4 ml-auto mr-auto hover:cursor-pointer bg-[#cebdba] hover:bg-[#b1a19f] transition duration-300 select-none"
-                    onClick={() =>
-                      claimData.quantity > 0
-                        ? parseInt(count) < claimData.quantity && setCount((parseInt(count) + 1).toString())
-                        : setCount((parseInt(count) + 1).toString())
-                    }
+                    onClick={handlePlusButton}
                   >
                     +
                   </div>
@@ -318,9 +379,16 @@ const Salamels = () => {
                     </svg>
                     <Tooltip className="!w-[20rem] md:!w-fit break-words" id="info-tooltip" />
                   </div>
-                  <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
-                    You have minted {amountMinted.toString()} of {claimData.quantity} Salamels available.
-                  </div>
+                  {hasPrivateMints() && amountMinted < claimData.quantity && (
+                    <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
+                      You have minted {amountMinted.toString()} of {claimData.quantity} Salamels available.
+                    </div>
+                  )}
+                  {hasPrivateMints() && amountMinted >= claimData.quantity && (
+                    <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
+                      You have minted the maximum discounted Salamels available. You can still mint at full price.
+                    </div>
+                  )}
                 </>
               )}
               <PrimaryButton
@@ -328,25 +396,15 @@ const Salamels = () => {
                 disabled={!isConnected || !hasSufficientBalance() || isMintTxLoading || count == "0"}
                 onClick={handleMint}
               >
-                {isConnected
-                  ? !hasSufficientBalance()
-                    ? "INSUFFICIENT BALANCE"
-                    : isMintTxLoading
-                    ? "MINTING..."
-                    : "MINT"
-                  : "CONNECT WALLET"}
+                {getMintButtonText()}
               </PrimaryButton>
-              {/* <div
-            onClick={handleMint}
-            className={`bg-red-500 max-w-[35rem] py-2 text-center hover:cursor-pointer hover:bg-red-400 transition duration-300 select-none ${(!hasSufficientBalance() || isMintTxLoading || count == "0") &&
-              "opacity-50 !cursor-default pointer-events-none"
-              }`}
-          >
 
-          </div> */}
               <div className="max-w-[35rem] ">
                 <div className="mt-6 max-w-[25rem] flex flex-row justify-between w-full mx-auto">
-                  <div>{"REMAINING PUBLIC MINTS PHASE " + phase}</div>
+                  <div>{"CURRENT PHASE: " + phase}</div>
+                </div>
+                <div className="max-w-[25rem] flex flex-row justify-between w-full mx-auto">
+                  <div>{"REMAINING SALAMELS"}</div>
                   <div>{amountPublicMinted}/500</div>
                 </div>
                 <div className="max-w-[25rem] flex flex-row justify-between w-full mx-auto">
