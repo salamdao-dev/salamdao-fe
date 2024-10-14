@@ -10,9 +10,10 @@ const baseUrl = process.env.VERCEL_URL
   : `http://localhost:${process.env.PORT || 3000}`;
 const imageUrl = `${baseUrl}/thumbnail.jpg`;
 
-const title = "SalamDAO";
-const titleTemplate = "%s | SalamDAO";
-const description = "Restake with SalamDAO to maximize your yield!";
+const title = "Salamels";
+const titleTemplate = "%s | Salamels";
+const description =
+  "Jump into the SALAMEL caravan, where camels stroll through Karaks sunbaked sands, chasing that juicy ORGANIC ALFALFA. Restaking has never been more chill.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

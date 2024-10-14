@@ -15,6 +15,7 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
     error Salamels__InvalidPaymentAmount();
     error Salamels__PhaseMintsExceeded();
     error Salamels__MaxMintsPerAddressPerPhaseExceeded();
+    error Salamels__TotalMintedAmountOverMaxQuantity();
 
     uint16 private _phase;
     bool private _enforceWalletLimit;
@@ -96,8 +97,10 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
 
         uint256 addressMintsAfterMint = _addressMintsPerPhase[_msgSender()][currentPhase] + quantity;
 
-        if (addressMintsAfterMint > MAX_MINTS_PER_ADDRESS_PER_PHASE && _enforceWalletLimit) {
-            revert Salamels__MaxMintsPerAddressPerPhaseExceeded();
+        if (_enforceWalletLimit) {
+            if (addressMintsAfterMint > MAX_MINTS_PER_ADDRESS_PER_PHASE) {
+                revert Salamels__MaxMintsPerAddressPerPhaseExceeded();
+            }
         }
 
         unchecked {
@@ -118,8 +121,14 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
         // Total mints claimed by the sender for the current phase
         uint256 addressMints = _addressMintsPerPhase[_msgSender()][currentPhase];
 
-        if (addressMints + quantityToMint > MAX_MINTS_PER_ADDRESS_PER_PHASE) {
+        uint256 totalAddressMints = addressMints + quantityToMint;
+
+        if (totalAddressMints > MAX_MINTS_PER_ADDRESS_PER_PHASE) {
             revert Salamels__MaxMintsPerAddressPerPhaseExceeded();
+        }
+
+        if (totalAddressMints > maxQuantity) {
+            revert Salamels__TotalMintedAmountOverMaxQuantity();
         }
 
         if (currentPhaseMints < quantityToMint) {
@@ -138,6 +147,30 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
         return bytes(baseTokenURI).length > 0
             ? string(abi.encodePacked(baseTokenURI, tokenId.toString(), suffixURI))
             : "";
+    }
+
+    function domainSeparatorV4() external view returns (bytes32 domainSeparator) {
+        domainSeparator = _domainSeparatorV4();
+    }
+
+    function getPhaseMints(uint16 phase) external view returns (uint256) {
+        return _phaseMints[phase];
+    }
+
+    function getPublicMints(uint16 phase) external view returns (uint256) {
+        return _publicMints[phase];
+    }
+
+    function getAddressMintsPerPhase(address user, uint16 phase) external view returns (uint256) {
+        return _addressMintsPerPhase[user][phase];
+    }
+
+    function getBasePrice() external view returns (uint256) {
+        return _basePrice;
+    }
+
+    function getMaxMintsPerAddressPerPhase() external pure returns (uint256) {
+        return MAX_MINTS_PER_ADDRESS_PER_PHASE;
     }
 
     function _mintToken(address to, uint256 tokenId) internal virtual override {

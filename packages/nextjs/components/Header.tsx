@@ -20,10 +20,10 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "NFT",
     href: "/",
   },
-  {
-    label: "Gallery",
-    href: "/gallery",
-  },
+  // {
+  //   label: "Gallery",
+  //   href: "/gallery",
+  // },
 ];
 
 export const HeaderMenuLinks = () => {

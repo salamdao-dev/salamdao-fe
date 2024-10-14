@@ -39,10 +39,7 @@ export const AddressInfoDropdown = ({ address, blockExplorerAddressLink }: Addre
   return (
     <>
       <details ref={dropdownRef} className="dropdown dropdown-end leading-3">
-        <summary
-          tabIndex={0}
-          className="list-none px-4 py-2 transition-all duration-300 ease-in-out text-black bg-gradient-to-b from-[#FF3217] via-[#E92E15] to-[#C92712] hover:from-[#FF3217] hover:via-[#E92E15] hover:to-[#971D0E] salamGreyBox"
-        >
+        <summary tabIndex={0} className="list-none px-4 py-2 border border-[#FF3217] rounded-none">
           <span className="ml-2 mr-1 text-sm sm:text-base md:text-lg lg:text-3xl">
             {checkSumAddress?.slice(0, 6) + "..." + checkSumAddress?.slice(-4)}
           </span>

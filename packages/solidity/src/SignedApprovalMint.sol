@@ -30,10 +30,6 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
     /// @dev The address of the signer for approved mints.
     address private _approvalSigner;
 
-    /// @dev The remaining amount of tokens mintable via signed approval minting.
-    /// NOTE: This is an aggregate of all signers, updating signer will not reset or modify this amount.
-    uint256 private _remainingSignedMints;
-
     /// @dev Emitted when signatures are decommissioned
     event SignedClaimsDecommissioned();
 
@@ -118,11 +114,6 @@ abstract contract SignedApprovalMintBase is MaxSupplyBase, EIP712 {
     /// @notice Returns the address of the approved signer
     function approvalSigner() public view returns (address) {
         return _approvalSigner;
-    }
-
-    /// @notice Returns the remaining amount of tokens mintable via signed approvals.
-    function remainingSignedMints() public view returns (uint256) {
-        return _remainingSignedMints;
     }
 
     /// @notice Returns true if signed claims have been decommissioned, false otherwise

@@ -7,6 +7,7 @@ import "forge-std/StdUtils.sol";
 import {TestBase} from "forge-std/Base.sol";
 import "creator-token-standards/utils/CreatorTokenTransferValidatorConfiguration.sol";
 import {CreatorTokenTransferValidator} from "creator-token-standards/utils/CreatorTokenTransferValidator.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "src/Salamels.sol";
 
@@ -61,6 +62,23 @@ contract BaseTest is StdCheats, StdAssertions, StdUtils, TestBase {
     function changePrank(address msgSender) internal virtual override {
         vm.stopPrank();
         vm.startPrank(msgSender);
+    }
+
+    function getSignature(uint256 sigKey, address wallet, uint256 maxQuantity, uint256 price) internal view returns (bytes memory signature) {
+        bytes32 digest = ECDSA.toTypedDataHash(
+            salamels.domainSeparatorV4(),
+            keccak256(
+                abi.encode(
+                    keccak256("Approved(address wallet,uint256 quantity,uint256 price)"),
+                    wallet,
+                    maxQuantity,
+                    price
+                )
+            )
+        );
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(sigKey, digest);
+        signature = abi.encodePacked(r, s, v);
     }
 
 }

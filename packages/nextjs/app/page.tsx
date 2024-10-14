@@ -75,7 +75,7 @@ const Salamels = () => {
       let sig = "";
 
       try {
-        const response = await fetch(`https://salamdao.vip/api/claims?address=${getAddress(address)}`, {
+        const response = await fetch(`https://salamdao.vip/api/claims?address=${getAddress(address).toLowerCase()}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -87,6 +87,7 @@ const Salamels = () => {
       } catch (error) {
         console.error("Error fetching claimable signature from backend: ", error);
       }
+      console.log("Claim data: ", price, quantity, sig);
       setClaimData({
         price: BigInt(price),
         quantity,
@@ -123,7 +124,13 @@ const Salamels = () => {
     value: basePrice * BigInt(count),
   };
 
-  const { data: hash, isPending, writeContract } = useWriteContract();
+  const {
+    data: hash,
+    isPending,
+    writeContract,
+    isError: isMintGenerationError,
+    error: mintGenerationError,
+  } = useWriteContract();
 
   const { isLoading, isSuccess, isError } = useWaitForTransactionReceipt({ hash });
 
@@ -170,7 +177,15 @@ const Salamels = () => {
     if (isError) {
       toast.error("Mint failed");
     }
-  }, [isError]);
+    if (isMintGenerationError) {
+      if (mintGenerationError.message.includes("User rejected the request.")) {
+        toast.error("Transaction Rejected");
+      } else {
+        toast.error("Mint failed, check console for details.");
+        console.error("Minting Error: ", mintGenerationError);
+      }
+    }
+  }, [isError, isMintGenerationError]);
 
   const hasSufficientBalance = () => {
     return balance.data && balance.data.value >= claimData.price * BigInt(count);
@@ -259,8 +274,7 @@ const Salamels = () => {
                 <>
                   <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
                     You are eligible for a{" "}
-                    {parseFloat(Number((basePrice - claimData.price) / claimData.price).toFixed(2)).toString()}%
-                    discount
+                    {((Number(basePrice - claimData.price) / Number(basePrice)) * 100).toFixed(0)}% discount
                     <svg
                       data-tooltip-id="info-tooltip"
                       data-tooltip-place="top-start"

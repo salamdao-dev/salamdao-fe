@@ -6,7 +6,6 @@ import "src/SignedApprovalMint.sol";
 
 contract SalamelsTest is BaseTest {
 
-    bytes testSig = abi.encodePacked(hex"13bd39d147958df822729f13ccf9a9d7bd55b96b0c6a53b804f3791da3686d6d193847de80e53244b4e115477b735e7d66941c87f3bd038e990e93223b277aad1b");
 
     modifier whenCallerIsNotOwner(address msgSender) {
         vm.assume(msgSender != admin);
@@ -27,7 +26,7 @@ contract SalamelsTest is BaseTest {
         assertEq(salamels.maxSupply(), 10000);
         assertEq(salamels.name(), "Salamels");
         assertEq(salamels.symbol(), "SALAM");
-        assertEq(address(salamels), 0xEDCE287288302dA74ddF09545f55eD7F8A6970Ab);
+        assertEq(address(salamels), 0x44AE3D01c4e7B6f8678E28e019c656e9fC382017);
         assertEq(salamels.baseTokenURI(), "");
         
         (address setRoyaltyReceiver, uint256 setRoyaltyAmount) = salamels.royaltyInfo(1, 1 ether);
@@ -42,6 +41,8 @@ contract SalamelsTest is BaseTest {
     function test_decommissionSignedApprovals() public whenCallerIsOwner {
         salamels.decommissionSignedApprovals();
         assertTrue(salamels.signedClaimsDecommissioned());
+
+        bytes memory testSig = getSignature(adminKey, admin, 1, 25000000000000000);
 
         vm.expectRevert(SignedApprovalMintBase.SignedApprovalMint__SignedClaimsAreDecommissioned.selector);
         salamels.claimSignedMint{value: 25000000000000000}(testSig, 1, 1, 25000000000000000);
@@ -228,14 +229,18 @@ contract SalamelsTest is BaseTest {
         assertEq(setRoyaltyAmount, 0.1 ether);
     }
 
-    function test_SignedMint() public {
+    function test_SignedMint_base() public {
         uint256 price = 25000000000000000;
         uint256 quantity = 10;
+
+        console2.log("signer:", salamels.approvalSigner());
+        console2.log("admin:", signer);
+
+        bytes memory testSig = getSignature(signerKey, alice, 10, 25000000000000000);
 
         changePrank(alice);
         vm.deal(alice, price * quantity);
         salamels.claimSignedMint{value: price * quantity}(testSig, quantity, quantity, price);
-        assertEq(salamels.remainingSignedMints(), 990);
 
         for (uint256 i = 1; i <= quantity; i++) {
             assertEq(salamels.ownerOf(i), alice);
@@ -246,38 +251,34 @@ contract SalamelsTest is BaseTest {
         uint256 price = 25000000000000000;
         uint256 quantity = 2;
         uint256 maxQuantity = 10;
+        
+        bytes memory testSig = getSignature(signerKey, alice, 10, 25000000000000000);
 
         changePrank(alice);
         vm.deal(alice, price * maxQuantity * 2);
 
         salamels.claimSignedMint{value: price * quantity}(testSig, quantity, maxQuantity, price);
-        assertEq(salamels.remainingSignedMints(), 998);
         assertEq(salamels.mintedSupply(), 2);
         assertEq(salamels.balanceOf(alice), 2);
 
         salamels.claimSignedMint{value: price * quantity}(testSig, quantity, maxQuantity, price);
-        assertEq(salamels.remainingSignedMints(), 996);
         assertEq(salamels.mintedSupply(), 4);
         assertEq(salamels.balanceOf(alice), 4);
 
         salamels.claimSignedMint{value: price * quantity}(testSig, quantity, maxQuantity, price);
-        assertEq(salamels.remainingSignedMints(), 994);
         assertEq(salamels.mintedSupply(), 6);
         assertEq(salamels.balanceOf(alice), 6);
 
         salamels.claimSignedMint{value: price * quantity}(testSig, quantity, maxQuantity, price);
-        assertEq(salamels.remainingSignedMints(), 992);
         assertEq(salamels.mintedSupply(), 8);
         assertEq(salamels.balanceOf(alice), 8);
 
         salamels.claimSignedMint{value: price * quantity}(testSig, quantity, maxQuantity, price);
-        assertEq(salamels.remainingSignedMints(), 990);
         assertEq(salamels.mintedSupply(), 10);
         assertEq(salamels.balanceOf(alice), 10);
 
-        vm.expectRevert(SignedApprovalMintBase.SignedApprovalMint__MintExceedsMaximumAmountBySignedApproval.selector);
+        vm.expectRevert(Salamels.Salamels__MaxMintsPerAddressPerPhaseExceeded.selector);
         salamels.claimSignedMint{value: price * quantity}(testSig, quantity, maxQuantity, price);
-        assertEq(salamels.remainingSignedMints(), 990);
         assertEq(salamels.mintedSupply(), 10);
         assertEq(salamels.balanceOf(alice), 10);
     }
@@ -286,6 +287,8 @@ contract SalamelsTest is BaseTest {
         quantityToMint = bound(quantityToMint, 11, 10_000);    
         uint256 price = 25000000000000000;
         uint256 maxAmount = 10;
+
+        bytes memory testSig = getSignature(signerKey, alice, 10, 25000000000000000);
 
         changePrank(alice);
         vm.deal(alice, price * quantityToMint);
@@ -299,6 +302,8 @@ contract SalamelsTest is BaseTest {
         uint256 quantityToMint = 10;
         uint256 maxAmount = 10;
 
+        bytes memory testSig = getSignature(signerKey, alice, 10, 25000000000000000);
+
         changePrank(alice);
         vm.deal(alice, price * quantityToMint);
         vm.expectRevert(SignedApprovalMintBase.SignedApprovalMint__InvalidSignature.selector);
@@ -311,9 +316,11 @@ contract SalamelsTest is BaseTest {
         uint256 price = 25000000000000000;
         uint256 maxAmount = 10;
 
+        bytes memory testSig = getSignature(signerKey, alice, 10, 25000000000000000);
+
         changePrank(alice);
         vm.deal(alice, price * amount);
-        vm.expectRevert(MaxSupplyBase.MaxSupplyBase__MaxSupplyExceeded.selector);
+        vm.expectRevert(Salamels.Salamels__MaxMintsPerAddressPerPhaseExceeded.selector);
         salamels.claimSignedMint{value: price * amount}(testSig, amount, maxAmount, price);
     }
 }

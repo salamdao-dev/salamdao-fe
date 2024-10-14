@@ -1,4 +1,4 @@
-import { PrivateKeyAccount, isAddress } from "viem";
+import { PrivateKeyAccount, isAddress, checksumAddress } from "viem";
 import { privateKeyToAccount } from 'viem/accounts'
 
 export interface Env {
@@ -33,8 +33,15 @@ const signData = async (account: PrivateKeyAccount, chainId: Number, salamelsAdd
 		],
 	};
 
+	const checksummedAddress = checksumAddress(address);
+	console.log("checksummedAddress", checksummedAddress);
+
+	if (!isAddress(checksummedAddress)) {
+		throw new Error("Invalid address");
+	}
+
 	const value = {
-		wallet: address,
+		wallet: checksummedAddress,
 		quantity,
 		price
 	};

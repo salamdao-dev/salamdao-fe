@@ -6,7 +6,6 @@ import { WrongNetworkDropdown } from "./WrongNetworkDropdown";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
-import PrimaryButton from "~~/components/common/PrimaryButton";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getBlockExplorerAddressLink } from "~~/utils/scaffold-eth";
 
@@ -24,9 +23,12 @@ export const RainbowKitCustomConnectButton = () => {
         return (
           <>
             {!connected ? (
-              <PrimaryButton className="text-sm sm:text-base md:text-lg lg:text-3xl" onClick={openConnectModal}>
+              <div
+                className="px-4 py-2  text-sm sm:text-base md:text-lg lg:text-3xl border border-[#FF3217] rounded-none"
+                onClick={openConnectModal}
+              >
                 connect
-              </PrimaryButton>
+              </div>
             ) : chain.unsupported || chain.id !== targetNetwork.id ? (
               <WrongNetworkDropdown />
             ) : (

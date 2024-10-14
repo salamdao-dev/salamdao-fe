@@ -9,6 +9,7 @@
 
 html,
 body {
+  font-family: 'Arial', sans-serif !important;
   height: 100%;
   overflow: hidden;
 }

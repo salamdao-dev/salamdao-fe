@@ -16,8 +16,9 @@ import scaffoldConfig from "~~/scaffold.config";
 const walletList = [metaMaskWallet, rainbowWallet, rabbyWallet, walletConnectWallet, safeWallet, coinbaseWallet];
 
 const connectors = connectorsForWallets([{ groupName: "wallets", wallets: walletList }], {
-  appName: "Salam DAO",
-  appDescription: "Restake with SalamDAO to maximize your returns on Karak",
+  appName: "Salamels",
+  appDescription:
+    "Jump into the SALAMEL caravan, where camels stroll through Karaks sunbaked sands, chasing that juicy ORGANIC ALFALFA. Restaking has never been more chill.",
   appIcon: "/Salam_Logomark_Black.svg",
   appUrl: "",
   projectId: scaffoldConfig.walletConnectProjectId,
