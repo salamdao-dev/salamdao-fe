@@ -24,6 +24,10 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "Telegram",
     href: "https://t.me/salamdoors",
   },
+  {
+    label: "Twitter",
+    href: "https://x.com/salam_gg_",
+  },
   // {
   //   label: "Gallery",
   //   href: "/gallery",
