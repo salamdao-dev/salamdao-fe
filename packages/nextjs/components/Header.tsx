@@ -20,6 +20,10 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "NFT",
     href: "/",
   },
+  {
+    label: "Telegram",
+    href: "https://t.me/salamdoors",
+  },
   // {
   //   label: "Gallery",
   //   href: "/gallery",

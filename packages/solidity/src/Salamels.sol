@@ -9,7 +9,7 @@ import 'creator-token-standards/access/OwnableBasic.sol';
 import 'src/SignedApprovalMint.sol';
 import 'src/libraries/SalamelStrings.sol';
 
-/**
+/*
  *
  *                                               ....................                                                          
  *                                                                                                                             
@@ -298,7 +298,7 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
 
     /**
      * @notice Retrieve the domain separator for the contract
-     * @return The domain separator
+     * @return domainSeparator The domain separator
      */
     function domainSeparatorV4() external view returns (bytes32 domainSeparator) {
         domainSeparator = _domainSeparatorV4();
@@ -336,8 +336,8 @@ contract Salamels is OwnableBasic, ERC721C, MetadataURI, SignedApprovalMint, Bas
      * @param phase The phase to retrieve the mints for
      * @return The number of mints claimed
      */
-    function getAddressMintsPerPhase(address user, uint16 phase) external view returns (uint256) {
-        return _addressMintsPerPhase[user][phase];
+    function getPublicMintsPerPhase(address user, uint16 phase) external view returns (uint256) {
+        return _publicMintsPerPhase[user][phase];
     }
 
     /**

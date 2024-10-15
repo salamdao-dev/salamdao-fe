@@ -16,11 +16,11 @@ export const networkList: Network[] = [
 
 export const salamels: Contract = {
   [chains.base.id]: {
-    address: "0xA1fa1FAdd83d7958C145f731D0fA51a8E53Bcc85",
+    address: "0xa1FA1fa38828261eC8a2F1a8B6B8402658e7b0fd",
     abi: SalamelsAbi,
   },
   [chains.baseSepolia.id]: {
-    address: "0xA1fa1FAdd83d7958C145f731D0fA51a8E53Bcc85",
+    address: "0xa1FA1fa38828261eC8a2F1a8B6B8402658e7b0fd",
     abi: SalamelsAbi,
   },
 };
