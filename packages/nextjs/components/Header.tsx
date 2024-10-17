@@ -39,7 +39,7 @@ export const HeaderMenuLinks = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-row w-full justify-center space-x-8">
+    <div className="flex flex-col sm:flex-row w-full justify-center space-y-4 mb-2 sm:mb-4 sm:space-y-0 sm:space-x-8">
       {menuLinks.map(({ label, href }) => {
         const isActive = pathname === href;
         return (
@@ -47,7 +47,7 @@ export const HeaderMenuLinks = () => {
             href={href}
             key={href}
             target={href.startsWith("http") ? "_blank" : undefined}
-            className="group transition-all duration-300 ease-in-out cursor-pointer text-sm sm:text-base md:text-lg lg:text-3xl"
+            className="group transition-all flex flex-row justify-center duration-300 ease-in-out cursor-pointer text-sm sm:text-base md:text-lg lg:text-3xl"
           >
             <span
               className={
@@ -104,7 +104,7 @@ export const Header = () => {
 
   return (
     <div className="sticky top-0 z-20 w-full px-4 py-3 sm:px-6 lg:px-8">
-      <div className="flex flex-row sm:grid sm:grid-cols-3 items-center mx-auto max-w-7xl">
+      <div className="flex flex-row justify-between sm:justify-start sm:grid sm:grid-cols-3 items-center mx-auto max-w-7xl">
         <div className="flex justify-start">
           <Link href="/" passHref>
             <Image alt="Salam logo" width={500} height={109} src="/Salam_Logo_Color.svg" className="w-full h-auto" />
@@ -115,7 +115,7 @@ export const Header = () => {
           <HeaderMenuLinks />
         </div>
 
-        <div className="hidden sm:flex justify-end flex-row">
+        <div className="flex justify-end flex-row">
           <div onClick={() => setShouldPlayAudio(!shouldPlayAudio)}>
             <img
               src="/muted.svg"
@@ -128,7 +128,7 @@ export const Header = () => {
               className={`w-auto h-full mr-4 ${shouldPlayAudio ? "block" : "hidden"}`}
             />
           </div>
-          <div className="flex items-center">
+          <div className="hidden sm:flex items-center">
             <RainbowKitCustomConnectButton />
           </div>
         </div>
@@ -151,10 +151,12 @@ export const Header = () => {
                 setIsDrawerOpen(false);
               }}
             >
-              <HeaderMenuLinks />
-              <li>
-                <RainbowKitCustomConnectButton />
-              </li>
+              <div className="flex flex-col">
+                <HeaderMenuLinks />
+                <li>
+                  <RainbowKitCustomConnectButton />
+                </li>
+              </div>
             </ul>
           )}
         </div>
