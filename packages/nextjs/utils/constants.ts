@@ -11,7 +11,7 @@ type Contract = {
 
 export const networkList: Network[] = [
   { id: 84532, name: "Base", icon: "/networks/base.svg" },
-  { id: 84532, name: "Base Sepolia", icon: "/networks/base.svg" },
+  // { id: 84532, name: "Base Sepolia", icon: "/networks/base.svg" },
 ];
 
 export const salamels: Contract = {

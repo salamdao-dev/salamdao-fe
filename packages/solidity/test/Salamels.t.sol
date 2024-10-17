@@ -322,4 +322,84 @@ contract SalamelsTest is BaseTest {
         vm.expectRevert(MaxSupplyBase.MaxSupplyBase__MaxSupplyExceeded.selector);
         salamels.claimSignedMint{value: price * amount}(testSig, amount, maxAmount, price);
     }
+
+    function test_publicMintOverMaxSupply() public {
+        uint256 price = 0.04 ether;
+        uint256 quantity = 10_000;
+
+        salamels.setPhase(1, 10_001, 10_001);
+        salamels.setEnforceWalletLimit(false);
+
+        changePrank(alice);
+        vm.deal(alice, type(uint256).max);
+
+        for (uint256 i = 1; i <= quantity; i++) {
+            salamels.publicMint{value: price}(1);
+        }
+
+        assertEq(salamels.mintedSupply(), salamels.maxSupply());
+
+        vm.expectRevert(MaxSupplyBase.MaxSupplyBase__MaxSupplyExceeded.selector);
+        salamels.publicMint{value: price}(1);
+    }
+
+    function test_publicMint_whenExceedsAmountPerPhase() public {
+        uint256 price = 0.04 ether;
+        uint256 quantity = 500;
+
+        salamels.setPhase(1, 500, 500);
+        salamels.setEnforceWalletLimit(false);
+
+        changePrank(alice);
+        vm.deal(alice, type(uint256).max);
+
+        for (uint256 i = 1; i <= quantity; i++) {
+            salamels.publicMint{value: price}(1);
+        }
+
+        assertEq(salamels.mintedSupply(), 500);
+
+        vm.expectRevert(Salamels.Salamels__PhaseMintsExceeded.selector);
+        salamels.publicMint{value: price}(1);
+    }
+
+    function test_publicMint_whenExceedsCurrentPhase() public {
+        uint256 price = 0.04 ether;
+        uint256 quantity = 500;
+
+        salamels.setPhase(1, 500, 500);
+        salamels.setEnforceWalletLimit(false);
+
+        changePrank(alice);
+        vm.deal(alice, type(uint256).max);
+
+        for (uint256 i = 1; i <= quantity; i++) {
+            salamels.publicMint{value: price}(1);
+        }
+
+        assertEq(salamels.mintedSupply(), 500);
+
+        vm.expectRevert(Salamels.Salamels__PhaseMintsExceeded.selector);
+        salamels.publicMint{value: price}(1);
+    }
+
+    function test_signedMint_whenExceedsMaxSupply() public {
+        uint256 price = 25000000000000000;
+        uint256 quantity = 10_001;
+
+        salamels.setPhase(1, 500, 500);
+        salamels.setEnforceWalletLimit(false);
+        
+        changePrank(alice);
+        vm.deal(alice, type(uint256).max);
+
+        bytes memory testSig = getSignature(signerKey, alice, quantity, 25000000000000000);
+
+        salamels.claimSignedMint{value: price * 500}(testSig, 500, quantity, price);
+
+        assertEq(salamels.mintedSupply(), 500);    
+
+        vm.expectRevert(Salamels.Salamels__PhaseMintsExceeded.selector);
+        salamels.claimSignedMint{value: price}(testSig, 1, quantity, price);
+    }
 }

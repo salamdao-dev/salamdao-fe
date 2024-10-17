@@ -29,6 +29,8 @@ contract DeploySalamels is Script {
         salamels.setBaseURI("https://7ltg4cky3ci3qsm2l22uoguxw2zwekluj2k55z5wbjeh5ueyeana.arweave.net/-uZuCVjYkbhJml61RxqXtrNiKXROld7ntgpIftCYIBo/");
         salamels.setSuffixURI(".json");
 
+        // salamels.setPhase(1, 500, 500); 
+
         CreatorTokenTransferValidator validator = CreatorTokenTransferValidator(salamels.getTransferValidator());
         validator.setTransferSecurityLevelOfCollection(address(salamels), 0, true, true, false);
 

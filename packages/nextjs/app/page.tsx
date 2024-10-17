@@ -36,6 +36,7 @@ const Salamels = () => {
   const [totalPrice, setTotalPrice] = useState<bigint>(BigInt(0));
   const [amountMinted, setAmountMinted] = useState<bigint>(BigInt(0));
   const [amountPublicMinted, setAmountPublicMinted] = useState<number>(0);
+  const [phaseMints, setPhaseMints] = useState<number>(0);
   const [phase, setPhase] = useState<number>(0);
   const [claimData, setClaimData] = useState<Claim>({
     price: BigInt(0),
@@ -171,6 +172,14 @@ const Salamels = () => {
         args: [phase],
       })) as bigint;
       setAmountPublicMinted(Number(publicMints));
+      const phaseMints = (await client?.readContract({
+        address: salamels[chain?.id as number].address,
+        abi: salamels[chain?.id as number].abi,
+        functionName: "getPhaseMints",
+        args: [phase],
+      })) as bigint;
+      console.log("Phase Mints: ", Number(phaseMints));
+      setPhaseMints(Number(phaseMints));
     };
 
     fetchClaims();
@@ -280,6 +289,8 @@ const Salamels = () => {
       return "INSUFFICIENT BALANCE";
     } else if (isMintTxLoading) {
       return "MINTING...";
+    } else if (phase === 0) {
+      return "MINT NOT OPEN YET";
     } else {
       return "MINT";
     }
@@ -388,25 +399,28 @@ const Salamels = () => {
               )}
               <PrimaryButton
                 className="max-w-[35rem] w-full justify-between text-sm sm:text-base md:text-lg lg:text-3xl"
-                disabled={!isConnected || !hasSufficientBalance() || isMintTxLoading || count == "0"}
+                disabled={!isConnected || !hasSufficientBalance() || isMintTxLoading || count == "0" || phase === 0}
                 onClick={handleMint}
               >
                 {getMintButtonText()}
               </PrimaryButton>
 
-              <div className="max-w-[35rem] ">
-                <div className="mt-6 max-w-[25rem] flex flex-row justify-between w-full mx-auto">
-                  <div>{"CURRENT PHASE: " + phase}</div>
+              {phase > 0 && (
+                <div className="max-w-[35rem] ">
+                  <div className="mt-6 max-w-[25rem] flex flex-row justify-between w-full mx-auto">
+                    <div>{"CURRENT PHASE: " + phase}</div>
+                  </div>
+                  <div className="max-w-[25rem] flex flex-row justify-between w-full mx-auto">
+                    <div>{"REMAINING SALAMELS"}</div>
+                    <div>{phaseMints + amountPublicMinted}</div>
+                  </div>
+                  <div className="max-w-[25rem] flex flex-row justify-between w-full mx-auto">
+                    <div>{"TOTAL MINTED"}</div>
+                    <div>{!isNaN(Number(nextTokenId)) ? Number(nextTokenId) - 1 : 0}/10000</div>
+                  </div>
                 </div>
-                <div className="max-w-[25rem] flex flex-row justify-between w-full mx-auto">
-                  <div>{"REMAINING SALAMELS"}</div>
-                  <div>{amountPublicMinted}/500</div>
-                </div>
-                <div className="max-w-[25rem] flex flex-row justify-between w-full mx-auto">
-                  <div>{"TOTAL MINTED"}</div>
-                  <div>{!isNaN(Number(nextTokenId)) ? Number(nextTokenId) - 1 : 0}/10000</div>
-                </div>
-              </div>
+              )}
+              {phase === 0 && <div className="mt-4" />}
             </div>
           </div>
         </div>
