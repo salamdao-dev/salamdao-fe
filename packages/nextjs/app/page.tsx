@@ -34,7 +34,7 @@ const Salamels = () => {
 
   const [count, setCount] = useState<string>("0");
   const [totalPrice, setTotalPrice] = useState<bigint>(BigInt(0));
-  const [amountMinted, setAmountMinted] = useState<bigint>(BigInt(0));
+  const [amountMinted] = useState<bigint>(BigInt(0));
   const [amountPublicMinted, setAmountPublicMinted] = useState<number>(0);
   const [phaseMints, setPhaseMints] = useState<number>(0);
   const [phase, setPhase] = useState<number>(0);
@@ -155,15 +155,15 @@ const Salamels = () => {
       })) as number;
       setPhase(phase);
 
-      const result = (await client?.readContract({
-        address: salamels[chain?.id as number].address,
-        abi: salamels[chain?.id as number].abi,
-        functionName: "getAddressMintsPerPhase",
-        args: [address, phase],
-      })) as bigint;
-      if (result !== amountMinted && result) {
-        setAmountMinted(result);
-      }
+      // const result = (await client?.readContract({
+      //   address: salamels[chain?.id as number].address,
+      //   abi: salamels[chain?.id as number].abi,
+      //   functionName: "getPublicMintsPerPhase",
+      //   args: [address, phase],
+      // })) as bigint;
+      // if (result !== amountMinted && result) {
+      //   setAmountMinted(result);
+      // }
 
       const publicMints = (await client?.readContract({
         address: salamels[chain?.id as number].address,
@@ -296,6 +296,9 @@ const Salamels = () => {
     }
   };
 
+  console.log("amount public minted: ", amountPublicMinted);
+  console.log("phase mints: ", phaseMints);
+
   return (
     <>
       <div className="salamels-bg" />
@@ -385,7 +388,7 @@ const Salamels = () => {
                     </svg>
                     <Tooltip className="!w-[20rem] md:!w-fit break-words" id="info-tooltip" />
                   </div>
-                  {hasPrivateMints() && amountMinted < claimData.quantity && (
+                  {/* {hasPrivateMints() && amountMinted < claimData.quantity && (
                     <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
                       You have minted {amountMinted.toString()} of {claimData.quantity} Salamels available.
                     </div>
@@ -394,7 +397,7 @@ const Salamels = () => {
                     <div className="text-sm text-right my-0 max-w-[35rem] mt-2 mb-1 flex flex-row justify-end">
                       You have minted the maximum discounted Salamels available. You can still mint at full price.
                     </div>
-                  )}
+                  )} */}
                 </>
               )}
               <PrimaryButton
